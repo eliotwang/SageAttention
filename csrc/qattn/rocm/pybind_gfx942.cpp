@@ -20,5 +20,6 @@
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m)
 {
-  m.def("kernel_test", &kernel_test, "rocWMMA:");
+  m.def("qk_v", &qk_v, "rocWMMA:");
+
 }

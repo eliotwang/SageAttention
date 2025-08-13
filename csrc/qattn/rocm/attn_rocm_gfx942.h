@@ -16,4 +16,4 @@
 
 #include <torch/extension.h>
 
-void kernel_test(int m, int n, int k, float a, float b);
+void qk_v(uint m, uint n, uint k, uint j);
