@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "../utils.cuh"
+#include "../../utils.cuh"
 #include <cuda_fp16.h>
 #include <cuda_pipeline_primitives.h>
 #include <torch/extension.h>
@@ -23,9 +23,9 @@
 #include "../mma.cuh"
 #include "../permuted_smem.cuh"
 #include "../math.cuh"
-#include "../dispatch_utils.h"
+#include "../../dispatch_utils.h"
 
-#include "attn_utils.cuh"
+#include "attn_utils.h"
 
 #define PACK_SIZE_QK 16 // as if it is int8
 #define PACK_SIZE_V 16  // fp8
@@ -234,6 +234,8 @@ __global__ void qk_int_sv_f8_attn_kernel(int8_t *__restrict__ Q, int8_t *__restr
           : kv_len,
       CTA_K);
 
+  //compute QK
+  
   // load Q with predicate
   load_global_to_share<global_to_shared_line_lanes_QK, global_to_shared_copy_lines_per_warp_QK, QK_smem_iters_row, Q_smem_iters_col, swizzle_mode_QK, QK_SMEM_STRIDE / PACK_SIZE_QK, CTA_Q>(
     &Q_lane_base_ptr, Q_smem_offset_load, stride_seq_q, smem_Q, Q_load_idx_lane_base, qo_len);

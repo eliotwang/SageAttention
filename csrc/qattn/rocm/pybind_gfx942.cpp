@@ -20,6 +20,6 @@
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m)
 {
-  m.def("qk_v", &qk_v, "rocWMMA:");
-
+  m.def("add_softmax", &add_softmax, "rocWMMA:");
+  // m.def("qk_int8_sv_f8_accum_f32_attn", &qk_int8_sv_f8_accum_f32_attn, "QK int8 sv f8 accum f32 attn");
 }

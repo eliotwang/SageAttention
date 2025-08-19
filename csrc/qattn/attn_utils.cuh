@@ -376,7 +376,7 @@ __device__ __forceinline__ void update_mdo(float RS[][num_tiles_k][8], DTypeSVAc
       {
         if constexpr (exp_offset)
         {
-          m_temp = fmaf(m_temp, sm_scale, -S_FP8_OFFSET);
+          m_temp = fmaf(m_temp, sm_scale, -S_FP8_OFFSET);//this
         }
         else
         {

@@ -211,8 +211,8 @@ qattn_rocm = CppExtension(
         "csrc/qattn/rocm/pybind_gfx942.cpp",
         # "csrc/qattn/rocm/kernel_test.hip",
         # "csrc/qattn/rocm/i8_pw_acc32.hip",
-        # "csrc/qattn/rocm/simple_gemm.hip",
-        "csrc/qattn/rocm/qk_v.hip",
+        # "csrc/qattn/rocm/simple_ge1d.hip",
+        "csrc/qattn/rocm/add_softmax.hip",
     ],
     include_dirs=[
         "third_party/rocwmma/library/include",

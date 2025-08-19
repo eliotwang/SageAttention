@@ -11,4 +11,4 @@ q_attn = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(q_attn)
 
 # 调用测试
-q_attn.simple_gemm(4096, 4096, 1024)
+q_attn.add_softmax(4096, 4096, 1024)

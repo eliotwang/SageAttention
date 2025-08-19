@@ -16,4 +16,15 @@
 
 #include <torch/extension.h>
 
-void qk_v(uint m, uint n, uint k, uint j);
+void add_softmax(uint m, uint n, uint k);
+// torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
+//                     torch::Tensor key,
+//                     torch::Tensor value,
+//                     torch::Tensor output,
+//                     torch::Tensor query_scale,
+//                     torch::Tensor key_scale,
+//                     int tensor_layout,
+//                     int is_causal,
+//                     int qk_quant_gran,
+//                     float sm_scale,
+//                     int return_lse);
