@@ -29,6 +29,10 @@
 
 #include <iostream>
 #include <mutex>
+#include <rocwmma/rocwmma.hpp>
+#include <rocwmma/rocwmma_coop.hpp>
+#include <rocwmma/rocwmma_transforms.hpp>
+#include "../../dispatch_utils.h"
 
 // Helper macro for HIP errors
 #ifndef CHECK_HIP_ERROR
@@ -61,74 +65,157 @@
 
 #include <rocwmma/internal/type_traits.hpp>
 
+using namespace rocwmma;
+
+namespace gfx9Params
+{
+    enum kernelParams : uint32_t
+    {
+        ROCWMMA_M = 32u,
+        ROCWMMA_N = 32u,
+        ROCWMMA_K = 32u,
+        BLOCKS_X  = 2u,
+        BLOCKS_Y  = 2u,
+        TBLOCK_X  = 128u,
+        TBLOCK_Y  = 2u,
+        WARP_SIZE = Constants::AMDGCN_WAVE_SIZE_64
+    };
+}
+
+namespace gfx11Params
+{
+    enum kernelParams : uint32_t
+    {
+        ROCWMMA_M = 16u,
+        ROCWMMA_N = 16u,
+        ROCWMMA_K = 16u,
+        BLOCKS_X  = 4u,
+        BLOCKS_Y  = 2u,
+        TBLOCK_X  = 64u,
+        TBLOCK_Y  = 4u,
+        WARP_SIZE = Constants::AMDGCN_WAVE_SIZE_32
+    };
+}
+
+#if(ROCWMMA_ARCH_GFX9)
+using namespace gfx9Params;
+#else
+using namespace gfx11Params;
+#endif // defined(ROCWMMA_ARCH_GFX9)
+
+// #if (ROCWMMA_ARCH_GFX9 || ROCWMMA_ARCH_GFX11)
+// Warp tile: computed by each warp
+constexpr uint32_t WARP_TILE_X = BLOCKS_X * ROCWMMA_M;
+constexpr uint32_t WARP_TILE_Y = BLOCKS_Y * ROCWMMA_N;
+
+// Macro Tile: computed by each thread block (workgroup)
+// Note: TBLOCK_X must be multiple of WARP_SIZE.
+constexpr uint32_t WARPS_X      = TBLOCK_X / WARP_SIZE;
+constexpr uint32_t WARPS_Y      = TBLOCK_Y;
+constexpr uint32_t MACRO_TILE_X = WARPS_X * WARP_TILE_X;
+constexpr uint32_t MACRO_TILE_Y = WARPS_Y * WARP_TILE_Y;
+
+
 // HIP Host functions to determine the gfx architecture
-bool isGfx9()
-{
-    hipDevice_t     mHandle;
-    hipDeviceProp_t mProps;
+// bool isGfx9()
+// {
+//     hipDevice_t     mHandle;
+//     hipDeviceProp_t mProps;
 
-    CHECK_HIP_ERROR(hipGetDevice(&mHandle));
-    CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
+//     CHECK_HIP_ERROR(hipGetDevice(&mHandle));
+//     CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
 
-    std::string deviceName(mProps.gcnArchName);
+//     std::string deviceName(mProps.gcnArchName);
 
-    return ((deviceName.find("gfx908") != std::string::npos)
-            || (deviceName.find("gfx90a") != std::string::npos)
-            || (deviceName.find("gfx940") != std::string::npos)
-            || (deviceName.find("gfx941") != std::string::npos)
-            || (deviceName.find("gfx942") != std::string::npos));
+//     return ((deviceName.find("gfx908") != std::string::npos)
+//             || (deviceName.find("gfx90a") != std::string::npos)
+//             || (deviceName.find("gfx940") != std::string::npos)
+//             || (deviceName.find("gfx941") != std::string::npos)
+//             || (deviceName.find("gfx942") != std::string::npos));
+// }
+
+// bool isGfx11()
+// {
+//     hipDevice_t     mHandle;
+//     hipDeviceProp_t mProps;
+
+//     CHECK_HIP_ERROR(hipGetDevice(&mHandle));
+//     CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
+
+//     std::string deviceName(mProps.gcnArchName);
+
+//     return ((deviceName.find("gfx1100") != std::string::npos)
+//             || (deviceName.find("gfx1101") != std::string::npos)
+//             || (deviceName.find("gfx1102") != std::string::npos));
+// }
+
+// bool isGfx12()
+// {
+//     hipDevice_t     mHandle;
+//     hipDeviceProp_t mProps;
+
+//     CHECK_HIP_ERROR(hipGetDevice(&mHandle));
+//     CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
+
+//     std::string deviceName(mProps.gcnArchName);
+
+//     return ((deviceName.find("gfx1200") != std::string::npos)
+//             || (deviceName.find("gfx1201") != std::string::npos));
+// }
+
+constexpr inline bool isGfx9() {
+#if defined(__gfx900__) || defined(__gfx906__) || defined(__gfx908__) || \
+    defined(__gfx90a__) || defined(__gfx940__) || defined(__gfx941__) || \
+    defined(__gfx942__)
+    return true;
+#else
+    return false;
+#endif
 }
 
-bool isGfx11()
-{
-    hipDevice_t     mHandle;
-    hipDeviceProp_t mProps;
-
-    CHECK_HIP_ERROR(hipGetDevice(&mHandle));
-    CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
-
-    std::string deviceName(mProps.gcnArchName);
-
-    return ((deviceName.find("gfx1100") != std::string::npos)
-            || (deviceName.find("gfx1101") != std::string::npos)
-            || (deviceName.find("gfx1102") != std::string::npos));
+constexpr inline bool isGfx11() {
+#if defined(__gfx1100__) || defined(__gfx1101__) || defined(__gfx1102__) || defined(__gfx1103__)
+    return true;
+#else
+    return false;
+#endif
 }
 
-bool isGfx12()
-{
-    hipDevice_t     mHandle;
-    hipDeviceProp_t mProps;
-
-    CHECK_HIP_ERROR(hipGetDevice(&mHandle));
-    CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
-
-    std::string deviceName(mProps.gcnArchName);
-
-    return ((deviceName.find("gfx1200") != std::string::npos)
-            || (deviceName.find("gfx1201") != std::string::npos));
+constexpr inline bool isGfx12() {
+#if defined(__gfx1200__) || defined(__gfx1201__)
+    return true;
+#else
+    return false;
+#endif
 }
 
-// HIP Host function to find if the device supports f64
-bool isF64Supported()
-{
-    hipDevice_t     mHandle;
-    hipDeviceProp_t mProps;
+// // HIP Host function to find if the device supports f64
+// bool isF64Supported()
+// {
+//     hipDevice_t     mHandle;
+//     hipDeviceProp_t mProps;
 
-    CHECK_HIP_ERROR(hipGetDevice(&mHandle));
-    CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
+//     CHECK_HIP_ERROR(hipGetDevice(&mHandle));
+//     CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
 
-    std::string deviceName(mProps.gcnArchName);
+//     std::string deviceName(mProps.gcnArchName);
 
-    return ((deviceName.find("gfx90a") != std::string::npos)
-            || (deviceName.find("gfx940") != std::string::npos)
-            || (deviceName.find("gfx941") != std::string::npos)
-            || (deviceName.find("gfx942") != std::string::npos));
-}
+//     return ((deviceName.find("gfx90a") != std::string::npos)
+//             || (deviceName.find("gfx940") != std::string::npos)
+//             || (deviceName.find("gfx941") != std::string::npos)
+//             || (deviceName.find("gfx942") != std::string::npos));
+// }
 
-bool isF32Supported()
-{
-    return isGfx9();
-}
+// bool isF32Supported()
+// {
+//     return isGfx9();
+// }
+
+constexpr inline bool isF64Supported() { return true; }
+constexpr inline bool isF32Supported() { return true; }
+
+// ROCm 下 wave64
+constexpr inline int getWarpSize() { return 64; }
 
 inline double calculateGFlops(uint32_t m, uint32_t n, uint32_t k)
 {
@@ -143,38 +230,38 @@ inline double calculateTFlopsPerSec(
 }
 
 // HIP Host function to retrieve the warp size
-enum hipWarpSize_t : uint32_t
-{
-    Wave32 = 32,
-    Wave64 = 64,
-    UNSUPPORTED_WARP_SIZE,
-};
+// enum hipWarpSize_t : uint32_t
+// {
+//     Wave32 = 32,
+//     Wave64 = 64,
+//     UNSUPPORTED_WARP_SIZE,
+// };
 
-uint32_t getWarpSize()
-{
-    hipDevice_t     mHandle;
-    hipDeviceProp_t mProps;
-    uint32_t        mWarpSize = hipWarpSize_t::UNSUPPORTED_WARP_SIZE;
+// uint32_t getWarpSize()
+// {
+//     hipDevice_t     mHandle;
+//     hipDeviceProp_t mProps;
+//     uint32_t        mWarpSize = hipWarpSize_t::UNSUPPORTED_WARP_SIZE;
 
-    CHECK_HIP_ERROR(hipGetDevice(&mHandle));
-    CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
+//     CHECK_HIP_ERROR(hipGetDevice(&mHandle));
+//     CHECK_HIP_ERROR(hipGetDeviceProperties(&mProps, mHandle));
 
-    switch(mProps.warpSize)
-    {
-    case hipWarpSize_t::Wave32:
-    case hipWarpSize_t::Wave64:
-        mWarpSize = mProps.warpSize;
-    default:;
-    }
+//     switch(mProps.warpSize)
+//     {
+//     case hipWarpSize_t::Wave32:
+//     case hipWarpSize_t::Wave64:
+//         mWarpSize = mProps.warpSize;
+//     default:;
+//     }
 
-    if(mWarpSize == hipWarpSize_t::UNSUPPORTED_WARP_SIZE)
-    {
-        std::cerr << "Cannot proceed: unsupported warp sizev detected. Exiting." << std::endl;
-        exit(EXIT_FAILURE);
-    }
+//     if(mWarpSize == hipWarpSize_t::UNSUPPORTED_WARP_SIZE)
+//     {
+//         std::cerr << "Cannot proceed: unsupported warp sizev detected. Exiting." << std::endl;
+//         exit(EXIT_FAILURE);
+//     }
 
-    return mWarpSize;
-}
+//     return mWarpSize;
+// }
 
 // Batched matrix data initialization
 template <typename DataT>

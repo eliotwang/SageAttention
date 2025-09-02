@@ -34,6 +34,8 @@
 #include <rocwmma/rocwmma_coop.hpp>
 #include <rocwmma/rocwmma_transforms.hpp>
 
+#include "attn_utils.h"
+
 #include "common.hpp"
 
 /* Motivation
@@ -515,15 +517,12 @@ ROCWMMA_DEVICE static inline void uniformFma(MfmaFragD (&fragsD)[BLOCKS_X][BLOCK
 
 template<uint32_t CTA_Q, uint32_t CTA_K, uint32_t WARP_Q, uint32_t WARP_K, uint32_t head_dim, DataType DTypeQK, QuantGranularity Q_GRAN, QuantGranularity K_GRAN,
         typename DTypeSVAccum = float, bool use_inst_buffer = false, typename DTypeOut = half, ComputeUnit DenominatorAccumUnit, MaskMode mask_mode = MaskMode::kNone, bool return_lse = false, bool fuse_v_scale=false, bool fuse_v_mean=false, bool use_pv_fp16_accu=false>
-ROCWMMA_KERNEL void __launch_bounds__(256) gemm_rocwmma_d(int8_t *__restrict__ Q, int8_t *__restrict__ K, int8_t *__restrict__ V, DTypeOut *__restrict__ O, float *__restrict__ Lse,
-                      float *__restrict__ Q_scale, float *__restrict__ K_scale, float *__restrict__ V_scale, float *__restrict__ V_mean,
+ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_t *__restrict__ K, int32_t *__restrict__ T, 
                       const uint32_t qo_len, const uint32_t kv_len, const uint32_t num_kv_groups,
                       const uint32_t stride_bz_q, const uint32_t stride_seq_q, const uint32_t stride_h_q, 
                       const uint32_t stride_bz_k, const uint32_t stride_seq_k, const uint32_t stride_h_k,
-                      const uint32_t stride_bz_v, const uint32_t stride_h_v, const uint32_t stride_d_v,
-                      const uint32_t stride_bz_o, const uint32_t stride_seq_o, const uint32_t stride_h_o,
-                      const uint32_t lda, const uint32_t ldb,float *__restrict__ T
-                      float sm_scale)
+                      const uint32_t stride_bz_t, const uint32_t stride_seq_t, const uint32_t stride_h_t,
+                      const uint32_t lda, const uint32_t ldb, const uint32_t ldd)
 {
     if constexpr(!ROCWMMA_ARCH_HOST)
     {
@@ -567,7 +566,7 @@ ROCWMMA_KERNEL void __launch_bounds__(256) gemm_rocwmma_d(int8_t *__restrict__ Q
                 : kv_len,
             CTA_K);
 
-        T=batch_id * stride_bz_q + head_id * stride_h_q;
+        T=batch_id * stride_bz_t + head_id * stride_h_t + bx * CTA_Q * stride_seq_t;
         for (uint32_t iter = 0; iter < num_iterations ; iter++)
         {
             ///
@@ -741,7 +740,7 @@ ROCWMMA_KERNEL void __launch_bounds__(256) gemm_rocwmma_d(int8_t *__restrict__ Q
             // MfmaFragD fragsD[BLOCKS_X][BLOCKS_Y];
             // uniformFma(fragsD, alpha, fragsAcc, beta, fragsC);
             globalWriteD(T + MfmaFragDMap1d::fromMatrixCoord(warpTileCoord, ldd), fragsAcc, ldd);
-            T += offssetT;//
+            T += CTA_K;//
         }
     }
 }
@@ -849,7 +848,7 @@ ROCWMMA_HOST void simple_ge1d(uint32_t m, uint32_t n, uint32_t k)
 
     ////
     auto rocwmmaKernel = [&]() {
-        hipExtLaunchKernelGGL(gemm_rocwmma_d,
+        hipExtLaunchKernelGGL(qk_gemm,
                               gridDim,
                               blockDim,
                               ldsusage,

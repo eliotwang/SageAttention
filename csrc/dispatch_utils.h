@@ -77,7 +77,7 @@
     using c_type = half;                                                                \
     __VA_ARGS__                                                                         \
   } else if (pytorch_dtype == at::ScalarType::BFloat16) {                               \
-    using c_type = nv_bfloat16;                                                         \
+    using c_type = hip_bfloat16;                                                         \
     __VA_ARGS__                                                                         \
   } else {                                                                              \
     std::ostringstream oss;                                                             \

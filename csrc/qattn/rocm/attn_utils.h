@@ -25,7 +25,7 @@
 // #include "../permuted_smem.cuh"
 // #include "../numeric_conversion.cuh"
 
-#define WARP_SIZE 32
+#define WARP_SIZE_CUDA 32
 
 #define S_FP8_OFFSET 8.807f
 #define S_FP8_OFFSET_EXP 6680.8477f
@@ -989,4 +989,4 @@ __device__ __forceinline__ uint32_t get_warp_idx_k()
 //       RO[fq][fv][7] += RO_inst_buf[fq][fv][7];
 //     }
 //   }
-}
+// }

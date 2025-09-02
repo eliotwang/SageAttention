@@ -192,38 +192,70 @@ for var in ("HCC_AMDGPU_TARGET", "AMDGPU_TARGETS", "HIPCC_COMPILE_FLAGS_APPEND",
 from torch.utils.cpp_extension import CppExtension
 
 # ROCm extension (build with hipcc)
-rocm_offload_arch = ["--offload-arch=gfx942"]
+from torch.utils.cpp_extension import CUDAExtension  # 用它来编 HIP
+IS_ROCM = getattr(torch.version, "hip", None) is not None
+ROCM_HOME = os.environ.get("ROCM_HOME", "/opt/rocm-6.3.0")
+TORCH_LIB_DIR = os.path.join(torch.__path__[0], "lib")
+ROCM_LIB_DIRS = [os.path.join(ROCM_HOME, "lib"), os.path.join(ROCM_HOME, "lib64")]
+
+rocm_offload_arch = ["--offload-arch=gfx942"]  # 按你的目标卡改
 
 rocm_cxx_flags = [
     "-O3", "-fPIC", "-std=c++17",
-    "-D__HIP_PLATFORM_AMD__=1",
     "-DUSE_ROCM=1",
-    "-DHIPBLAS_V2",
-    "-DCUDA_HAS_FP16=1",
+    "-D__HIP_PLATFORM_AMD__=1",
     "-D__HIP_NO_HALF_OPERATORS__=1",
     "-D__HIP_NO_HALF_CONVERSIONS__=1",
+    "-DHIPBLAS_V2",
     f"-D_GLIBCXX_USE_CXX11_ABI={ABI}",
+]
+
+# hipcc 的参数用 'nvcc' key 传入（在 ROCm 下会映射到 hipcc）
+rocm_hipcc_flags = [
+    "-O3", "-g", "-ggdb", "-std=c++17",
 ] + rocm_offload_arch
 
-qattn_rocm = CppExtension(
-    name="sageattention._qattn_rocm",
-    sources=[
-        "csrc/qattn/rocm/pybind_gfx942.cpp",
-        # "csrc/qattn/rocm/kernel_test.hip",
-        # "csrc/qattn/rocm/i8_pw_acc32.hip",
-        # "csrc/qattn/rocm/simple_ge1d.hip",
-        "csrc/qattn/rocm/add_softmax.hip",
-    ],
-    include_dirs=[
-        "third_party/rocwmma/library/include",
-        os.path.join(os.getenv("ROCM_HOME", "/opt/rocm"), "include"),
-        os.path.join(os.getenv("ROCM_HOME", "/opt/rocm"), "include", "hip"),
-        # 如果项目内还有头文件目录可加在这
-    ],
-    extra_compile_args={"cxx": rocm_cxx_flags},
-)
+if IS_ROCM:
+    qattn_rocm = CUDAExtension(
+        name="sageattention._qattn_rocm",
+        sources=[
+            "csrc/qattn/rocm/pybind_gfx942.cpp",
+            # "csrc/qattn/rocm/simple_ge1d.hip",
+            "csrc/qattn/rocm/qk_gemm.hip",
+            "csrc/qattn/rocm/sv_gemm.hip",
+            "csrc/qattn/rocm/gfx942.hip",
+            # "csrc/qattn/rocm/qk2douter.hip",
+            # "csrc/qattn/rocm/sv2d.hip",
+            # "csrc/qattn/rocm/gfx942_2d.hip",
+        ],
+        include_dirs=[
+            "third_party/rocwmma/library/include",
+            os.path.join(ROCM_HOME, "include"),
+            os.path.join(ROCM_HOME, "include", "hip"),
+        ],
+        extra_compile_args={"cxx": rocm_cxx_flags, "nvcc": rocm_hipcc_flags},
+        # 这三行确保无需 LD_LIBRARY_PATH 也能找到依赖
+        libraries=["amdhip64", "hiprtc", "rocblas", "hipblas"],   # 视你代码实际用到的库增减
+        library_dirs=ROCM_LIB_DIRS + [TORCH_LIB_DIR],
+        runtime_library_dirs=ROCM_LIB_DIRS + [TORCH_LIB_DIR],     # <— 关键
+    )
+    ext_modules.append(qattn_rocm)
 
-ext_modules.append(qattn_rocm)
+    fused_extension = CUDAExtension(
+    name="sageattention._fused",
+    sources=["csrc/fused/pybind_hip.cpp", "csrc/fused/fused.hip"],
+    include_dirs=[
+            "third_party/rocwmma/library/include",
+            os.path.join(ROCM_HOME, "include"),
+            os.path.join(ROCM_HOME, "include", "hip"),
+        ],
+    extra_compile_args={"cxx": rocm_cxx_flags, "nvcc": rocm_hipcc_flags},
+    # 这三行确保无需 LD_LIBRARY_PATH 也能找到依赖
+    libraries=["amdhip64", "hiprtc", "rocblas", "hipblas"],   # 视你代码实际用到的库增减
+    library_dirs=ROCM_LIB_DIRS + [TORCH_LIB_DIR],
+    runtime_library_dirs=ROCM_LIB_DIRS + [TORCH_LIB_DIR],
+    )
+    ext_modules.append(fused_extension)
 
 # ====== 保持你原本的并行编译与隔离输出目录的做法 ======
 parallel = None
