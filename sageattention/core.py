@@ -20,6 +20,7 @@ import torch.nn.functional as F
 from .triton.quant_per_block import per_block_int8 as per_block_int8_triton
 from .triton.quant_per_block_varlen import per_block_int8 as per_block_int8_varlen_triton
 from .triton.attn_qk_int8_per_block import forward as attn_false
+from .triton.attn_qk_int8_per_thread import forward as attn_thread_false
 from .triton.attn_qk_int8_per_block_causal import forward as attn_true
 from .triton.attn_qk_int8_block_varlen import forward as attn_false_varlen
 from .triton.attn_qk_int8_per_block_causal_varlen import forward as attn_true_varlen
@@ -84,6 +85,7 @@ def sageattn(
     return_lse: bool = False,
     **kwargs: Any,
 ):
+    # print("model v.shape:",v.shape)
     """
     Automatically selects the appropriate implementation of the SageAttention kernel based on the GPU compute capability.
 
@@ -137,7 +139,8 @@ def sageattn(
     - The tensors `q`, `k`, and `v` must have the dtype ``torch.float16`` or ``torch.bfloat16``
     - All tensors must be on the same cuda device.
     """
-    return sageattn_qk_int8_pv_fp8_cuda(q, k, v, tensor_layout=tensor_layout, is_causal=is_causal, sm_scale=sm_scale, return_lse=return_lse, pv_accum_dtype="fp32")
+    # return sageattn_qk_int8_pv_fp8_cuda(q, k, v, tensor_layout=tensor_layout, is_causal=is_causal, sm_scale=sm_scale, return_lse=return_lse, pv_accum_dtype="fp32")
+    return sageattn_qk_int8_pv_fp16_triton(q, k, v, tensor_layout=tensor_layout, is_causal=is_causal, sm_scale=sm_scale, return_lse=return_lse)
     # arch = get_cuda_arch_versions()[q.device.index]
     # if arch == "sm80":
     #     return sageattn_qk_int8_pv_fp16_cuda(q, k, v, tensor_layout=tensor_layout, is_causal=is_causal, sm_scale=sm_scale, return_lse=return_lse, pv_accum_dtype="fp32")
@@ -288,7 +291,8 @@ def sageattn_qk_int8_pv_fp16_triton(
         sm_scale = 1.0 / (head_dim_og ** 0.5)
 
     if quantization_backend == "triton":
-        q_int8, q_scale, k_int8, k_scale = per_block_int8_triton(q, k, km=km, sm_scale=sm_scale, tensor_layout=tensor_layout)
+        q_int8, q_scale, k_int8, k_scale = per_thread_int8_triton(q, k, km=km, sm_scale=sm_scale, tensor_layout=tensor_layout)
+        # q_int8, q_scale, k_int8, k_scale = per_block_int8_triton(q, k, km=km, sm_scale=sm_scale, tensor_layout=tensor_layout)
     elif quantization_backend == "cuda":
         q_int8, q_scale, k_int8, k_scale = per_block_int8_cuda(q, k, km=km, sm_scale=sm_scale, tensor_layout=tensor_layout)
     else:
@@ -308,7 +312,42 @@ def sageattn_qk_int8_pv_fp16_triton(
                 attn_mask = attn_mask.expand(target_shape)
             except Exception:
                 raise AssertionError(f"attn_mask shape {attn_mask.shape} cannot be broadcast to {target_shape}")
-        o, lse = attn_false(q_int8, k_int8, v, q_scale, k_scale, tensor_layout=tensor_layout, output_dtype=dtype, attn_mask=attn_mask, return_lse=return_lse)
+        # o, lse = attn_false(q_int8, k_int8, v, q_scale, k_scale, tensor_layout=tensor_layout, output_dtype=dtype, attn_mask=attn_mask, return_lse=return_lse)
+        o, lse = attn_thread_false(q_int8, k_int8, v, q_scale, k_scale, sm_scale=sm_scale, tensor_layout=tensor_layout, output_dtype=dtype, attn_mask=attn_mask, return_lse=return_lse)
+
+    import os, sys
+    import torch.distributed as dist
+
+    SAVE_PATH = "/home/o_files/o.pt"     # 放到你的挂载卷
+    MARKER    = SAVE_PATH + ".first"       # “谁先创建谁保存”的标记文件
+
+    def _is_rank0():
+        return not (dist.is_available() and dist.is_initialized()) or dist.get_rank() == 0
+
+    def _save_quant_once(o, save_path=SAVE_PATH, marker=MARKER):
+        # 1) 只有 rank0 尝试保存（多卡时避免每张卡都抢）
+        if not _is_rank0():
+            return
+        # 2) 尝试原子创建标记文件，谁成功谁保存；其余进程直接返回
+        try:
+            fd = os.open(marker, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            return  # 已有其它进程抢到“第一次”
+        else:
+            # 写点内容方便排查
+            with os.fdopen(fd, "w") as f:
+                f.write("saved\n")
+
+        # 3) 真正保存：先写临时文件，再原子替换，避免半写入
+        tmp = save_path + ".tmp"
+        torch.save(
+            {"o": o.detach().cpu()},
+            tmp
+        )
+        os.replace(tmp, save_path)  # POSIX 原子替换
+        print(f"[INFO] Quantized V saved to: {save_path}")
+        sys.stdout.flush()
+    _save_quant_once(o)
 
     o = o[..., :head_dim_og]
 
@@ -776,7 +815,45 @@ def sageattn_qk_int8_pv_fp8_cuda(
         quant_v_scale_max = 2.25
 
     v_fp8, v_scale, vm = per_channel_fp8(v, tensor_layout=tensor_layout, scale_max=quant_v_scale_max, smooth_v=smooth_v)
+    # print(f"-----------------------------{smooth_v}-----------------------------")
+    # print(f"-----------------------------------------------------{tensor_layout}-------------------------------")
+    # print("v.shape:",v.shape)
+    # print("v_fp8 shape:", v_fp8.shape)    # FP8 量化后的张量
+    # print("v_scale shape:", v_scale.shape)
+    import os, sys
+    import torch.distributed as dist
 
+    SAVE_PATH = "/home/o_files/o.pt"     # 放到你的挂载卷
+    MARKER    = SAVE_PATH + ".first"       # “谁先创建谁保存”的标记文件
+
+    def _is_rank0():
+        return not (dist.is_available() and dist.is_initialized()) or dist.get_rank() == 0
+
+    def _save_quant_once(o, save_path=SAVE_PATH, marker=MARKER):
+        # 1) 只有 rank0 尝试保存（多卡时避免每张卡都抢）
+        if not _is_rank0():
+            return
+        # 2) 尝试原子创建标记文件，谁成功谁保存；其余进程直接返回
+        try:
+            fd = os.open(marker, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            return  # 已有其它进程抢到“第一次”
+        else:
+            # 写点内容方便排查
+            with os.fdopen(fd, "w") as f:
+                f.write("saved\n")
+
+        # 3) 真正保存：先写临时文件，再原子替换，避免半写入
+        tmp = save_path + ".tmp"
+        torch.save(
+            {"o": o.detach().cpu()},
+            tmp
+        )
+        os.replace(tmp, save_path)  # POSIX 原子替换
+        print(f"[INFO] Quantized V saved to: {save_path}")
+        sys.stdout.flush()
+
+    # _save_quant_once(v_fp8, v_scale)
     # if pv_accum_dtype == "fp32":
     #     if smooth_v:
     #         lse = _qattn_sm89.qk_int8_sv_f8_accum_f32_fuse_v_scale_fuse_v_mean_attn(q_int8, k_int8, v_fp8, o, q_scale, k_scale, v_scale, vm, _tensor_layout, _is_caual, _qk_quant_gran, sm_scale, _return_lse)
@@ -790,9 +867,12 @@ def sageattn_qk_int8_pv_fp8_cuda(
     lse = _qattn_rocm.qk_int8_sv_f8_accum_f32_attn(q_int8, k_int8, v_fp8, o, q_scale, k_scale, v_scale, _tensor_layout, _is_caual, _qk_quant_gran, sm_scale, _return_lse)
     o = o[..., :head_dim_og]
 
+    # _save_quant_once(o)
+
     if return_lse:
         return o, lse / 1.44269504 + lse_correction * sm_scale if smooth_k else lse / 1.44269504
     else:
+        # print("--------------------------------nolse-----------------------------------")
         return o
 
 @torch.compiler.disable

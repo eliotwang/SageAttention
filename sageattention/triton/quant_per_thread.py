@@ -87,6 +87,10 @@ def quant_key_per_thread_int8_kernel(Input, Output, Scale, L,
     x0 = x0.to(tl.float32)
     x1 = x1.to(tl.float32)
     scale = max(tl.max(tl.abs(x0)), tl.max(tl.abs(x1))) / 127. + 0.0000001
+    # m0 = tl.max(tl.abs(x0))
+    # m1 = tl.max(tl.abs(x1))
+    # scale = tl.maximum(m0, m1) / 127.0
+    # scale = tl.maximum(scale, 1e-8)
     x0_int8 = x0 / scale
     x1_int8 = x1 / scale
     x0_int8 += 0.5 * tl.where(x0_int8 >= 0, 1, -1)

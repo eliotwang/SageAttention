@@ -280,7 +280,35 @@ def per_channel_fp8(
     
     _fused.transpose_pad_permute_cuda(v, v_transposed_permutted, _tensor_layout)
 
-    v_fp8 = torch.empty(v_transposed_permutted.shape, dtype=torch.float8_e4m3fn, device=v.device)
+    # import os, sys
+    # import torch.distributed as dist
+
+    # SAVE_PATH = "/home/v_transposed_permuted.pt"
+    # MARKER    = SAVE_PATH + ".first"
+
+    # def _is_rank0():
+    #     return not (dist.is_available() and dist.is_initialized()) or dist.get_rank() == 0
+
+    # def _save_once(tensor, path=SAVE_PATH, marker=MARKER):
+    #     # 仅 rank0 保存
+    #     if not _is_rank0():
+    #         return
+    #     try:
+    #         fd = os.open(marker, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    #     except FileExistsError:
+    #         return  # 已保存
+    #     else:
+    #         with os.fdopen(fd, "w") as f:
+    #             f.write("saved\n")
+
+    #     tmp = path + ".tmp"
+    #     torch.save(tensor.detach().cpu(), tmp)
+    #     os.replace(tmp, path)
+    #     print(f"[INFO] v_transposed_permuted saved to: {path}")
+    #     sys.stdout.flush()
+    # _save_once(v_transposed_permutted)
+
+    v_fp8 = torch.empty(v_transposed_permutted.shape, dtype=torch.float8_e4m3fnuz, device=v.device)
 
     v_scale = torch.empty((b, h_kv, head_dim), dtype=torch.float32, device=v.device)
     vm = torch.empty((b, h_kv, head_dim), dtype=torch.float32, device=v.device)

@@ -117,81 +117,72 @@ namespace detail {
   template<typename T>
   __device__ __forceinline__ void load_8xT_to_regs(const T* __restrict__ ptr, T (&dst)[8]) {
     static_assert(sizeof(T) == 2, "T must be 16-bit (half/bfloat16)");
-    // 要求 16 字节对齐：8×2B
-    // 使用 reinterpret_cast 的向量化搬运，避免严格别名问题
     const uint4* __restrict__ src = reinterpret_cast<const uint4*>(ptr);
     *reinterpret_cast<uint4*>(&dst[0]) = *src;
   }
 
   __device__ __forceinline__ void store_8fp8(const uint32_t* __restrict__ fp8x4,
                                            int8_t* __restrict__ out) {
-    // 8 个 FP8 = 8B，一次写一个 uint2（需要 <hip/hip_runtime.h> 支持 uint2）
     *reinterpret_cast<uint2*>(out) = *reinterpret_cast<const uint2*>(fp8x4);
   }
 
   // ---- E4M3 打包：float32 -> uint8（rn、satfinite、非 subnormal）----
-  __device__ __forceinline__ uint8_t float_to_e4m3_rn_satfinite(float x) {
-    // 处理 NaN/Inf
-    if (!isfinite(x)) {
-      // satfinite：NaN/±Inf 全部饱和到最大有限值（保留符号）
-      // E4M3 最大有限值 ≈ 448，按编码: sign | exp=14 | mant=0b111
-      const uint8_t POS_MAX = 0x6F; // 0b0110_1111
-      const uint8_t NEG_MAX = 0xEF; // 0b1110_1111
-      return signbit(x) ? NEG_MAX : POS_MAX;
-    }
+  // E4M3：1|4|3，bias=7；rn-even；satfinite；不产生 subnormal（下溢置0）
+  __device__ __forceinline__ uint8_t float_to_e4m3_rn_satfinite_relaxed(float x) {
+    // NaN/Inf -> satfinite（带符号），用你定义的“最大码”
+    const uint8_t POS_MAX_CODE = 0x6F;  // sign=0, exp=14, mant=7  -> +240
+    const uint8_t NEG_MAX_CODE = 0xEF;  // sign=1, exp=14, mant=7  -> -240
 
-    // 0 或极小：直接给 0（E4M3 很少用 subnormal，这里直接 flush）
-    if (x == 0.0f) return 0u;
+    if (!isfinite(x)) return signbit(x) ? NEG_MAX_CODE : POS_MAX_CODE;
+    if (x == 0.0f)    return 0u;
 
-    // 提取符号并取绝对值
-    uint8_t s = signbit(x) ? 0x80 : 0x00;
+    const uint8_t s = signbit(x) ? 0x80 : 0x00;
     float ax = fabsf(x);
 
-    // E4M3 最大有限值（以标量近似）：448.0f
-    // 最小正规值：2^(1-bias) = 2^(1-7) = 2^-6 = 1/64 ≈ 0.015625
-    // 这里直接做 satfinite：>448 饱和到 448
-    if (ax > 448.0f) {
-      return s | 0x6F; // exp=14, mant=7
-    }
-    // 免费小于最小正规值时，直接变 0（不做 subnormal）
-    if (ax < (1.0f / 64.0f)) {
-      return s | 0x00;
-    }
+    // 最小正规值 = 2^(1-bias) = 2^-6
+    if (ax < (1.0f / 64.0f)) return s | 0x00;  // 不做 subnormal：直接 0
 
-    // 目标：x = (1.mmmm)_2 * 2^(e), 其中 E4M3: e' = e + 7 (bias=7)，mant 3 bits
-    // 用 frexpf 分解：ax = m * 2^e, m in [0.5, 1.0)
-    int e;
-    float m = frexpf(ax, &e);               // ax = m * 2^e
-    // 规范化到 [1,2)：(0.5,1) -> [1,2)
-    m *= 2.0f; e -= 1;
+    // 规格化 ax = m * 2^e，m∈[1,2)
+    int   e;
+    float m = frexpf(ax, &e);   // m∈[0.5,1)
+    m *= 2.0f; e -= 1;          // m∈[1,2)
 
-    // 量化到 3 位尾数：mant = round_to_nearest_even(m * 2^3 - 1)
-    // 因为 m ∈ [1,2)，去掉隐含的 leading 1，相当于对 (m - 1) * 2^3 做四舍五入
-    float mant_f = (m - 1.0f) * 8.0f;       // 8 = 2^3
-    // rn-even：加 0.5 后向下取整，但对 .5 做偶数舍入
+    // 量化 3 位尾数（去掉隐含 1）：mant = rn_even((m-1)*8)
+    float mant_f  = (m - 1.0f) * 8.0f;  // ∈[0,8)
     float floor_v = floorf(mant_f);
     float frac_v  = mant_f - floor_v;
-    int mant;
-    if (frac_v > 0.5f)       mant = (int)floor_v + 1;
-    else if (frac_v < 0.5f)  mant = (int)floor_v;
-    else { // frac==0.5，偶数舍入
-      mant = ((int)floor_v & 1) ? (int)floor_v + 1 : (int)floor_v;
-    }
 
-    // 处理 mant 进位：mant==8 -> mant=0, e+1
+    int mant;
+    if      (frac_v > 0.5f) mant = (int)floor_v + 1;
+    else if (frac_v < 0.5f) mant = (int)floor_v;
+    else                    mant = ((int)floor_v & 1) ? (int)floor_v + 1 : (int)floor_v;
+
+    // 尾数进位：mant==8 -> mant=0, e+1
     if (mant == 8) { mant = 0; e += 1; }
 
-    // 计算偏置指数
-    int eb = e + 7;  // bias=7
-    // 指数上溢：satfinite
-    if (eb > 0xE) {  // 0xE == 14 (保留 0xF=15 作为 Inf/NaN，satfinite 不用)
-      return s | 0x6F;
-    }
-    // 指数下溢：flush to zero（不做 subnormal）
-    if (eb <= 0) {
-      return s | 0x00;
+    // 带偏置指数
+    int eb = e + 7;
+
+    // 下溢：不做 subnormal，直接 0
+    if (eb <= 0) return s | 0x00;
+
+    // ------- 关键改动：指数=15 的处理规则 -------
+    // 仅当 eb==15 且 mant==7 时，判定为“上溢”（你定义的溢出码）；
+    // 其他 eb==15 且 mant!=7 的情况，按“有效数”编码（非常规做法，需上下游一致解码）。
+    if (eb >= 0xF) {
+      if (mant >= 7) {
+        // eb==15 且 mant==7 -> 上溢（饱和到“最大码”）
+        // 这里沿用你原有的“最大有限值”码（exp=14,mant=7），或你也可以选择返回 (15,7) 本码
+        return s ? NEG_MAX_CODE : POS_MAX_CODE;
+      } else {
+        // eb==15 且 mant!=7 -> 视为有效数（非常规编码）
+        uint8_t e_bits = 0xF;
+        uint8_t m_bits = (uint8_t)(mant & 0x7);
+        return s | (e_bits << 3) | m_bits;
+      }
     }
 
+    // 常规（eb=1..14）
     uint8_t e_bits = (uint8_t)(eb & 0xF);
     uint8_t m_bits = (uint8_t)(mant & 0x7);
     return s | (e_bits << 3) | m_bits;
@@ -202,10 +193,10 @@ namespace detail {
     // 注意：你原 PTX 的打包顺序是
     //   lo = cvt(..., s0[1], s0[0]); hi = cvt(..., s1[1], s1[0]); mov.b32 {lo,hi}
     // 具体字节序请按你的上游/下游约定来（下面给出常用“小端：b0=LSB”示例）
-    uint8_t b0 = float_to_e4m3_rn_satfinite(s0[0]);
-    uint8_t b1 = float_to_e4m3_rn_satfinite(s0[1]);
-    uint8_t b2 = float_to_e4m3_rn_satfinite(s1[0]);
-    uint8_t b3 = float_to_e4m3_rn_satfinite(s1[1]);
+    uint8_t b0 = float_to_e4m3_rn_satfinite_relaxed(s0[0]);
+    uint8_t b1 = float_to_e4m3_rn_satfinite_relaxed(s0[1]);
+    uint8_t b2 = float_to_e4m3_rn_satfinite_relaxed(s1[0]);
+    uint8_t b3 = float_to_e4m3_rn_satfinite_relaxed(s1[1]);
 
     // 32-bit 小端拼接：最低字节是 b0
     *dest = (uint32_t)b0 | ((uint32_t)b1 << 8) | ((uint32_t)b2 << 16) | ((uint32_t)b3 << 24);
@@ -308,7 +299,7 @@ __global__ void MeanScaleKernel(T *__restrict__ input, int8_t *__restrict__ outp
 #pragma unroll
     for (uint32_t j = 0; j < 8; j++)
     {
-      detail::load_8xT_to_regs(input_ptr_base + i * gmem_stride, x_val);
+      x_val_float[j] = convert_to_float(x_val[j]);
       if constexpr (sub_mean)
       {
         x_val_float[j] = (x_val_float[j] - mean_val) * recp_scale;

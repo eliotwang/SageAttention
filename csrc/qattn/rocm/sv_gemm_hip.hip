@@ -423,7 +423,7 @@ ROCWMMA_DEVICE static inline void mfma(MfmaFragAcc (&fragsAccOut)[BLOCKS_X][BLOC
 }
 
 
-template<uint32_t CTA_Q, uint32_t CTA_K, uint32_t WARP_Q, uint32_t WARP_K, uint32_t head_dim, DataType DTypeQK, QuantGranularity Q_GRAN, QuantGranularity K_GRAN,
+template<uint32_t CTA_Q, uint32_t CTA_K, uint32_t WARP_Q, uint32_t WARP_K, uint32_t head_dim, QuantGranularity Q_GRAN, QuantGranularity K_GRAN,
         typename DTypeSVAccum = float, bool use_inst_buffer = false, typename DTypeOut = float, ComputeUnit DenominatorAccumUnit, MaskMode mask_mode = MaskMode::kNone, bool return_lse = false, bool fuse_v_scale=false, bool fuse_v_mean=false, bool use_pv_fp16_accu=false>
 ROCWMMA_KERNEL void __launch_bounds__(256) sv_gemm(InputT *__restrict__ T, InputT *__restrict__ V, DTypeOut *__restrict__ O, float *__restrict__ Lse,
                       float *__restrict__ V_scale, float *__restrict__ V_mean,

@@ -10,7 +10,7 @@ os.environ["PYTORCH_HIP_ALLOC_CONF"] = "expandable_segments:True,garbage_collect
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str, default="THUDM/CogVideoX-2b", help='Model path')
 parser.add_argument('--compile', action='store_true', help='Compile the model')
-parser.add_argument('--attention_type', type=str, default='sdpa', choices=['sdpa', 'sage', 'fa3', 'fa3_fp8'], help='Attention type')
+parser.add_argument('--attention_type', type=str, default='sage', choices=['sdpa', 'sage', 'fa3', 'fa3_fp8'], help='Attention type')
 args = parser.parse_args()
 
 if args.attention_type == 'sage':
@@ -36,7 +36,9 @@ pipe.enable_model_cpu_offload()
 pipe.vae.enable_slicing()
 pipe.vae.enable_tiling()
 
+import time
 with torch.no_grad():
+    start = time.time()
     video = pipe(
         prompt=prompt,
         guidance_scale=1.0,          # 关掉 CFG，避免把 batch 翻倍
@@ -47,5 +49,7 @@ with torch.no_grad():
         num_videos_per_prompt=1,
         generator=torch.Generator(device="cuda").manual_seed(42),
     ).frames[0]
+    end = time.time()     
+    print(f"[INFO] Inference took {end - start:.2f} seconds")
 
-export_to_video(video, f"cogvideox-2b_new_{args.attention_type}.mp4", fps=8)
+export_to_video(video, f"pt_triton_{args.attention_type}.mp4", fps=8)

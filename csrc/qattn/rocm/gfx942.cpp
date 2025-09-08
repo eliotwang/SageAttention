@@ -186,7 +186,7 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
             dim3 grid(div_ceil(qo_len, CTA_Q), num_qo_heads, batch_size);
             dim3 block(128,2);
 
-            hipEventRecord(ev_qk_s, stream);
+            // hipEventRecord(ev_qk_s, stream);
             kernel_func_qk<<<grid, block, smem_max>>>(
               query.data_ptr<int8_t>(), 
               key.data_ptr<int8_t>(),
@@ -198,9 +198,9 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
               stride_bz_k, stride_seq_k, stride_h_k,
               stride_bz_t, stride_seq_t, stride_h_t,
               lda, ldb, ldd);
-            hipEventRecord(ev_qk_e, stream);
+            // hipEventRecord(ev_qk_e, stream);
 
-            hipEventRecord(ev_soft_s, stream);
+            // hipEventRecord(ev_soft_s, stream);
               //softmax
               // ---------- build logits from t_f32 (int32) → dequantize by Q/K scales → base-2 softmax ----------
               TORCH_CHECK(t_f32.is_cuda() && t_f32.scalar_type() == at::kInt, "t_f32 must be CUDA int32");
@@ -261,19 +261,26 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
 
               if (IS_CAUSAL) {
                 auto neg_inf = -std::numeric_limits<float>::infinity();
-                auto tri = at::triu(at::ones({qo_len, kv_len}, logits.options()), /*diagonal=*/1);
-                logits = logits + tri * neg_inf;
+                auto mask = at::triu(
+                  at::ones({qo_len, kv_len}, at::TensorOptions().device(logits.device()).dtype(at::kBool)),
+                    /*diagonal=*/1);
+                logits = logits.masked_fill(mask, neg_inf);
               }
 
               // base-2 softmax：等价于对 (logits - max) 乘 ln2 再做 exp
               constexpr float kLn2 = 0.6931471805599453094f;
               auto m = std::get<0>(logits.max(/*dim=*/-1, /*keepdim=*/true));
-              auto z = logits - m;
+              auto z = (logits - m).masked_fill(~at::isfinite(logits), -std::numeric_limits<float>::infinity());
               auto w = at::exp(z * kLn2);                 // 2^(z) = exp(z * ln2)
-              auto denom = w.sum(/*dim=*/-1, /*keepdim=*/true);
-              auto probs = w / denom;
+              auto denom = w.sum(/*dim=*/-1, /*keepdim=*/true).clamp_min(1e-20f);
+              auto probs = (w / denom).nan_to_num(/*nan=*/0.0f, /*posinf=*/0.0f, /*neginf=*/0.0f);
 
               value = value.to(at::kFloat8_e4m3fnuz).contiguous();
+
+              TORCH_CHECK((probs.ge(0) & probs.le(1)).all().item<bool>(), "probs out of [0,1]");
+                auto row_sum = probs.sum(-1);  // [B,H,qo_len]
+                TORCH_CHECK((row_sum.isfinite()).all().item<bool>(), "row_sum not finite");
+                //TORCH_CHECK(row_sum.sub(1.0).abs().max().item<float>() < 1e-2, "softmax row_sum deviates from 1");
               at::Tensor s = probs.to(at::kFloat8_e4m3fnuz).contiguous();
 
               using HostF8 = c10::Float8_e4m3fnuz;
@@ -291,16 +298,16 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
               TORCH_CHECK(value.dtype() == at::kFloat8_e4m3fnuz && s.dtype() == at::kFloat8_e4m3fnuz,
                           "value/s must be Float8_e4m3fnuz");
               TORCH_CHECK(value.is_contiguous() && s.is_contiguous(), "value/s must be contiguous");
-              hipEventRecord(ev_soft_e, stream);
+            //   hipEventRecord(ev_soft_e, stream);
 
               ldb = head_dim;
               ldd = head_dim;
-              auto kernel_func_sv = sv_gemm<CTA_Q, CTA_K, WARP_Q, WARP_K, HEAD_DIM, DataType::kInt8, static_cast<QuantGranularity>(QK_QUANT_GRAN), static_cast<QuantGranularity>(QK_QUANT_GRAN),
+              auto kernel_func_sv = sv_gemm<CTA_Q, CTA_K, WARP_Q, WARP_K, HEAD_DIM, static_cast<QuantGranularity>(QK_QUANT_GRAN), static_cast<QuantGranularity>(QK_QUANT_GRAN),
                                                         float, false, float, ComputeUnit::kCudaCore, mask_mode, RETURN_LSE, false, false, false>;
 
               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
 
-              hipEventRecord(ev_sv_s, stream);
+            //   hipEventRecord(ev_sv_s, stream);
               kernel_func_sv<<<grid, block, smem_max>>>(
               s_ptr,
               v_ptr,
@@ -319,19 +326,19 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
               output.copy_(o_fp32);
               
 
-              float ms_qk=0.f, ms_soft=0.f, ms_sv=0.f;
-              hipEventElapsedTime(&ms_qk,  ev_qk_s,  ev_qk_e);
-              hipEventElapsedTime(&ms_soft, ev_soft_s, ev_soft_e);
-              hipEventElapsedTime(&ms_sv,   ev_sv_s,   ev_sv_e);
+            //   float ms_qk=0.f, ms_soft=0.f, ms_sv=0.f;
+            //   hipEventElapsedTime(&ms_qk,  ev_qk_s,  ev_qk_e);
+            //   hipEventElapsedTime(&ms_soft, ev_soft_s, ev_soft_e);
+            //   hipEventElapsedTime(&ms_sv,   ev_sv_s,   ev_sv_e);
 
               // 可选：打印或存下来
-              printf("QK GEMM: %.3f ms, Softmax: %.3f ms, SV GEMM: %.3f ms\n",
-                    ms_qk, ms_soft, ms_sv);
+            //   printf("QK GEMM: %.3f ms, Softmax: %.3f ms, SV GEMM: %.3f ms\n",
+            //         ms_qk, ms_soft, ms_sv);
 
               // 销毁 events
-              hipEventDestroy(ev_qk_s);  hipEventDestroy(ev_qk_e);
-              hipEventDestroy(ev_soft_s); hipEventDestroy(ev_soft_e);
-              hipEventDestroy(ev_sv_s);   hipEventDestroy(ev_sv_e);
+            //   hipEventDestroy(ev_qk_s);  hipEventDestroy(ev_qk_e);
+            //   hipEventDestroy(ev_soft_s); hipEventDestroy(ev_soft_e);
+            //   hipEventDestroy(ev_sv_s);   hipEventDestroy(ev_sv_e);
           });
         });
       });
