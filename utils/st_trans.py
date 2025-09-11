@@ -2,8 +2,8 @@ import torch
 import pandas as pd
 
 # 参数
-PT_FILE = "/home/o_files/o.pt"
-CSV_FILE = "/home/o_files/per_threadtrue2.csv"
+PT_FILE = "/home/tmp/triton/qk.pt"
+CSV_FILE = "/home/tmp/triton/qk.csv"
 NUM_VALUES = 2048  # 导出多少个数
 
 # 读取 .pt 文件

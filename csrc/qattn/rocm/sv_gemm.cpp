@@ -223,41 +223,7 @@ using namespace rocwmma;
 *|_________|________________________________|
 */
 
-namespace gfx9Params
-{
-    enum kernelParams : uint32_t
-    {
-        ROCWMMA_M = 16u,
-        ROCWMMA_N = 16u,
-        ROCWMMA_K = 64u,
-        BLOCKS_X  = 2u,
-        BLOCKS_Y  = 2u,
-        TBLOCK_X  = 128u,
-        TBLOCK_Y  = 2u,
-        WARP_SIZE = Constants::AMDGCN_WAVE_SIZE_64
-    };
-}
 
-namespace gfx11Params
-{
-    enum kernelParams : uint32_t
-    {
-        ROCWMMA_M = 16u,
-        ROCWMMA_N = 16u,
-        ROCWMMA_K = 16u,
-        BLOCKS_X  = 4u,
-        BLOCKS_Y  = 2u,
-        TBLOCK_X  = 64u,
-        TBLOCK_Y  = 4u,
-        WARP_SIZE = Constants::AMDGCN_WAVE_SIZE_32
-    };
-}
-
-#if(ROCWMMA_ARCH_GFX9)
-using namespace gfx9Params;
-#else
-using namespace gfx11Params;
-#endif // defined(ROCWMMA_ARCH_GFX9)
 
 ///
 /// Types and Data Layouts
@@ -277,17 +243,6 @@ using DataLayoutLds = col_major;
 /// Fragment types
 ///
 
-// #if (ROCWMMA_ARCH_GFX9 || ROCWMMA_ARCH_GFX11)
-// Warp tile: computed by each warp
-constexpr uint32_t WARP_TILE_X = BLOCKS_X * ROCWMMA_M;
-constexpr uint32_t WARP_TILE_Y = BLOCKS_Y * ROCWMMA_N;
-
-// Macro Tile: computed by each thread block (workgroup)
-// Note: TBLOCK_X must be multiple of WARP_SIZE.
-constexpr uint32_t WARPS_X      = TBLOCK_X / WARP_SIZE;
-constexpr uint32_t WARPS_Y      = TBLOCK_Y;
-constexpr uint32_t MACRO_TILE_X = WARPS_X * WARP_TILE_X;
-constexpr uint32_t MACRO_TILE_Y = WARPS_Y * WARP_TILE_Y;
 
 // Mfma frags
 using MfmaFragS   = fragment<matrix_a, ROCWMMA_M, ROCWMMA_N, ROCWMMA_K, InputT, DataLayoutS>;
@@ -408,30 +363,6 @@ ROCWMMA_DEVICE static inline void
     }
 }
 
-// Global C reads for warp tile gemm, non-cooperative
-ROCWMMA_DEVICE static inline void
-    globalReadC(MfmaFragO (&fragC)[BLOCKS_X][BLOCKS_Y], OutputT const* gAddrC, uint32_t ldc)
-{
-    using FragShape = GetIOShape_t<MfmaFragO>;
-    using Mapper1d  = GetDataLayout_t<MfmaFragO>;
-
-    // Iterative offsets for each C block in the wave tile
-    auto blockStepX = Mapper1d::fromMatrixCoord(make_coord2d(FragShape::BlockHeight, 0u), ldc);
-    auto blockStepY = Mapper1d::fromMatrixCoord(make_coord2d(0u, FragShape::BlockWidth), ldc);
-
-#pragma unroll
-    for(int i = 0; i < BLOCKS_X; i++)
-    {
-        auto offsetY = 0u;
-#pragma unroll
-        for(int j = 0; j < BLOCKS_Y; j++)
-        {
-            load_matrix_sync(fragC[i][j], gAddrC + offsetY, ldc);
-            offsetY += blockStepY;
-        }
-        gAddrC += blockStepX;
-    }
-}
 
 // Global D reads for warp tile gemm, non-cooperative
 ROCWMMA_DEVICE static inline void
@@ -460,7 +391,7 @@ ROCWMMA_DEVICE static inline void
 
 // Broadcast value to fragments in warp tile
 template <typename FragT>
-ROCWMMA_DEVICE static inline void fill(FragT (&frags)[BLOCKS_X][BLOCKS_Y],
+ROCWMMA_DEVICE static inline void fillQK(FragT (&frags)[BLOCKS_X][BLOCKS_Y],
                                        GetDataType_t<FragT> value)
 {
 #pragma unroll
@@ -491,33 +422,10 @@ ROCWMMA_DEVICE static inline void mfma(MfmaFragAcc (&fragsAccOut)[BLOCKS_X][BLOC
     }
 }
 
-// Uniform multiply - add (FMA)
-// Performs D = alpha * acc + beta * C, where alpha, beta are uniform scalars
-ROCWMMA_DEVICE static inline void uniformFma(MfmaFragD (&fragsD)[BLOCKS_X][BLOCKS_Y],
-                                             ComputeT alpha,
-                                             MfmaFragAcc const (&fragsAcc)[BLOCKS_X][BLOCKS_Y],
-                                             ComputeT beta,
-                                             MfmaFragO const (&fragsC)[BLOCKS_X][BLOCKS_Y])
-{
-#pragma unroll
-    for(int i = 0; i < BLOCKS_X; i++)
-    {
-#pragma unroll
-        for(int j = 0; j < BLOCKS_Y; j++)
-        {
-            for(int k = 0; k < fragsD[i][j].num_elements; k++)
-            {
-                // Perform computation in ComputeT and cast back to OutputT
-                fragsD[i][j].x[k] = static_cast<OutputT>(
-                    alpha * fragsAcc[i][j].x[k] + beta * static_cast<ComputeT>(fragsC[i][j].x[k]));
-            }
-        }
-    }
-}
 
 template<uint32_t CTA_Q, uint32_t CTA_K, uint32_t WARP_Q, uint32_t WARP_K, uint32_t head_dim, QuantGranularity Q_GRAN, QuantGranularity K_GRAN,
-        typename DTypeSVAccum = float, bool use_inst_buffer = false, typename DTypeOut = half, ComputeUnit DenominatorAccumUnit, MaskMode mask_mode = MaskMode::kNone, bool return_lse = false, bool fuse_v_scale=false, bool fuse_v_mean=false, bool use_pv_fp16_accu=false>
-ROCWMMA_KERNEL void __launch_bounds__(256) sv_gemm(float *__restrict__ T, int8_t *__restrict__ V, DTypeOut *__restrict__ O, float *__restrict__ Lse,
+        typename DTypeSVAccum = float, bool use_inst_buffer = false, typename DTypeOut = float, ComputeUnit DenominatorAccumUnit, MaskMode mask_mode = MaskMode::kNone, bool return_lse = false, bool fuse_v_scale=false, bool fuse_v_mean=false, bool use_pv_fp16_accu=false>
+ROCWMMA_KERNEL void __launch_bounds__(256) sv_gemm(InputT *__restrict__ T, InputT *__restrict__ V, DTypeOut *__restrict__ O, float *__restrict__ Lse,
                       float *__restrict__ V_scale, float *__restrict__ V_mean,
                       const uint32_t qo_len, const uint32_t kv_len, const uint32_t num_kv_groups,
                       const uint32_t stride_bz_t, const uint32_t stride_seq_t, const uint32_t stride_h_t,
@@ -551,7 +459,7 @@ ROCWMMA_KERNEL void __launch_bounds__(256) sv_gemm(float *__restrict__ T, int8_t
 
         // Bounds check
         auto warpTileBound = warpTileCoord + warpTileSize;
-        if(get<0>(warpTileBound) > qo_len || get<1>(warpTileBound) > kv_len)
+        if(get<0>(warpTileBound) > qo_len || get<1>(warpTileBound) > head_dim)
         {
             return;
         }
@@ -581,7 +489,7 @@ ROCWMMA_KERNEL void __launch_bounds__(256) sv_gemm(float *__restrict__ T, int8_t
                 = batch_id * stride_bz_t + head_id * stride_h_t
                 + GRBuffQMap1d::fromMatrixCoord(make_coord2d(get<0>(macroTileCoord), 0u), lda);
             auto globalReadOffsetB
-                = batch_id * stride_bz_v + (head_id / num_kv_groups) * stride_h_v + iter * CTA_K * stride_d_v 
+                = batch_id * stride_bz_v + (head_id / num_kv_groups) * stride_h_v + //iter * CTA_K * stride_d_v 
                 + GRBuffKMap1d::fromMatrixCoord(make_coord2d(0u, get<1>(macroTileCoord)), ldb);
 
             // Incremental global read address offsets
@@ -658,7 +566,7 @@ ROCWMMA_KERNEL void __launch_bounds__(256) sv_gemm(float *__restrict__ T, int8_t
             /// Initialize accumulation frags
             ///
             MfmaFragAcc fragsAcc[BLOCKS_X][BLOCKS_Y];
-            fill(fragsAcc, 0.0f);
+            fillQK(fragsAcc, 0.0f);
 
             ///
             /// Synchronize warps and memory
@@ -732,222 +640,222 @@ ROCWMMA_KERNEL void __launch_bounds__(256) sv_gemm(float *__restrict__ T, int8_t
     }
 }
 
-ROCWMMA_HOST void simple_ge1d(uint32_t m, uint32_t n, uint32_t k)
-{
-    // Runtime checks for host parameters
-    uint32_t hTBLOCK_X    = isGfx9() ? gfx9Params::TBLOCK_X : gfx11Params::TBLOCK_X;
-    uint32_t hTBLOCK_Y    = isGfx9() ? gfx9Params::TBLOCK_Y : gfx11Params::TBLOCK_Y;
-    uint32_t hBLOCKS_X    = isGfx9() ? gfx9Params::BLOCKS_X : gfx11Params::BLOCKS_X;
-    uint32_t hBLOCKS_Y    = isGfx9() ? gfx9Params::BLOCKS_Y : gfx11Params::BLOCKS_Y;
-    uint32_t hROCWMMA_M   = isGfx9() ? gfx9Params::ROCWMMA_M : gfx11Params::ROCWMMA_M;
-    uint32_t hROCWMMA_N   = isGfx9() ? gfx9Params::ROCWMMA_N : gfx11Params::ROCWMMA_N;
-    uint32_t hROCWMMA_K   = isGfx9() ? gfx9Params::ROCWMMA_K : gfx11Params::ROCWMMA_K;
-    uint32_t hWARP_TILE_X = hBLOCKS_X * hROCWMMA_M;
-    uint32_t hWARP_TILE_Y = hBLOCKS_Y * hROCWMMA_N;
+// ROCWMMA_HOST void simple_ge1d(uint32_t m, uint32_t n, uint32_t k)
+// {
+//     // Runtime checks for host parameters
+//     uint32_t hTBLOCK_X    = isGfx9() ? gfx9Params::TBLOCK_X : gfx11Params::TBLOCK_X;
+//     uint32_t hTBLOCK_Y    = isGfx9() ? gfx9Params::TBLOCK_Y : gfx11Params::TBLOCK_Y;
+//     uint32_t hBLOCKS_X    = isGfx9() ? gfx9Params::BLOCKS_X : gfx11Params::BLOCKS_X;
+//     uint32_t hBLOCKS_Y    = isGfx9() ? gfx9Params::BLOCKS_Y : gfx11Params::BLOCKS_Y;
+//     uint32_t hROCWMMA_M   = isGfx9() ? gfx9Params::ROCWMMA_M : gfx11Params::ROCWMMA_M;
+//     uint32_t hROCWMMA_N   = isGfx9() ? gfx9Params::ROCWMMA_N : gfx11Params::ROCWMMA_N;
+//     uint32_t hROCWMMA_K   = isGfx9() ? gfx9Params::ROCWMMA_K : gfx11Params::ROCWMMA_K;
+//     uint32_t hWARP_TILE_X = hBLOCKS_X * hROCWMMA_M;
+//     uint32_t hWARP_TILE_Y = hBLOCKS_Y * hROCWMMA_N;
 
-    // Runtime warp calculation (host code needs to query warpsize dynamically)
-    auto warpSize = getWarpSize();
-    auto macroTileSize
-        = rocwmma::make_coord2d(hTBLOCK_X / warpSize * hWARP_TILE_X, hTBLOCK_Y * hWARP_TILE_Y);
+//     // Runtime warp calculation (host code needs to query warpsize dynamically)
+//     auto warpSize = getWarpSize();
+//     auto macroTileSize
+//         = rocwmma::make_coord2d(hTBLOCK_X / warpSize * hWARP_TILE_X, hTBLOCK_Y * hWARP_TILE_Y);
 
-    // Device check for supported block and wave sizes
-    if((isGfx11() || isGfx12()) && (hROCWMMA_M != 16 || hROCWMMA_N != 16))
-    {
-        std::cout << "Unsupported block size!\n";
-        return;
-    }
+//     // Device check for supported block and wave sizes
+//     if((isGfx11() || isGfx12()) && (hROCWMMA_M != 16 || hROCWMMA_N != 16))
+//     {
+//         std::cout << "Unsupported block size!\n";
+//         return;
+//     }
 
-    if(isGfx9() && (hROCWMMA_M != hROCWMMA_N) || (hROCWMMA_M != 16 && hROCWMMA_M != 32))
-    {
-        std::cout << "Unsupported block size!\n";
-        return;
-    }
+//     if(isGfx9() && (hROCWMMA_M != hROCWMMA_N) || (hROCWMMA_M != 16 && hROCWMMA_M != 32))
+//     {
+//         std::cout << "Unsupported block size!\n";
+//         return;
+//     }
 
-    if((isGfx11() || isGfx12()) && getWarpSize() != Constants::AMDGCN_WAVE_SIZE_32)
-    {
-        std::cout << "Unsupported wave size!\n";
-        return;
-    }
+//     if((isGfx11() || isGfx12()) && getWarpSize() != Constants::AMDGCN_WAVE_SIZE_32)
+//     {
+//         std::cout << "Unsupported wave size!\n";
+//         return;
+//     }
 
-    if(isGfx9() && getWarpSize() != Constants::AMDGCN_WAVE_SIZE_64)
-    {
-        std::cout << "Unsupported wave size!\n";
-        return;
-    }
+//     if(isGfx9() && getWarpSize() != Constants::AMDGCN_WAVE_SIZE_64)
+//     {
+//         std::cout << "Unsupported wave size!\n";
+//         return;
+//     }
 
-    // Bounds check
-    if((m < get<0>(macroTileSize) || n < get<1>(macroTileSize) || k < hROCWMMA_K)
-       || (m % hROCWMMA_M || n % hROCWMMA_N || k % hROCWMMA_K))
-    {
-        std::cout << "Unsupported matrix size!\n";
-        return;
-    }
+//     // Bounds check
+//     if((m < get<0>(macroTileSize) || n < get<1>(macroTileSize) || k < hROCWMMA_K)
+//        || (m % hROCWMMA_M || n % hROCWMMA_N || k % hROCWMMA_K))
+//     {
+//         std::cout << "Unsupported matrix size!\n";
+//         return;
+//     }
 
-    // Layouts leading dims
-    int lda = std::is_same_v<DataLayoutS, row_major> ? k : m;
-    int ldb = std::is_same_v<DataLayoutV, row_major> ? n : k;
-    int ldc = std::is_same_v<DataLayoutO, row_major> ? n : m;
-    int ldd = ldc;
+//     // Layouts leading dims
+//     int lda = std::is_same_v<DataLayoutS, row_major> ? k : m;
+//     int ldb = std::is_same_v<DataLayoutV, row_major> ? n : k;
+//     int ldc = std::is_same_v<DataLayoutO, row_major> ? n : m;
+//     int ldd = ldc;
 
-    std::cout << "Initializing host data..." << std::endl;
+//     std::cout << "Initializing host data..." << std::endl;
 
-    // Initialize input matrices
-    std::vector<InputT>  matrixA(m * k);
-    std::vector<InputT>  matrixB(k * n);
+//     // Initialize input matrices
+//     std::vector<InputT>  matrixA(m * k);
+//     std::vector<InputT>  matrixB(k * n);
 
-    // Fill outputs with NaN to catch contamination
-    std::vector<OutputT> matrixD(m * n, std::numeric_limits<OutputT>::signaling_NaN());
+//     // Fill outputs with NaN to catch contamination
+//     std::vector<OutputT> matrixD(m * n, std::numeric_limits<OutputT>::signaling_NaN());
 
-    fillRand(matrixA.data(), m, k);
-    fillRand(matrixB.data(), k, n);
+//     fillRand(matrixA.data(), m, k);
+//     fillRand(matrixB.data(), k, n);
 
-    std::cout << "Initializing device data..." << std::endl;
+//     std::cout << "Initializing device data..." << std::endl;
 
-    // Allocate and copy device memory
-    InputT*  d_a;
-    InputT*  d_b;
-    OutputT* d_d;
+//     // Allocate and copy device memory
+//     InputT*  d_a;
+//     InputT*  d_b;
+//     OutputT* d_d;
 
-    const size_t bytesA = matrixA.size() * sizeof(InputT);
-    const size_t bytesB = matrixB.size() * sizeof(InputT);
-    const size_t bytesD = matrixD.size() * sizeof(OutputT);
+//     const size_t bytesA = matrixA.size() * sizeof(InputT);
+//     const size_t bytesB = matrixB.size() * sizeof(InputT);
+//     const size_t bytesD = matrixD.size() * sizeof(OutputT);
 
-    CHECK_HIP_ERROR(hipMalloc(&d_a, bytesA));
-    CHECK_HIP_ERROR(hipMalloc(&d_b, bytesB));
-    CHECK_HIP_ERROR(hipMalloc(&d_d, bytesD));
+//     CHECK_HIP_ERROR(hipMalloc(&d_a, bytesA));
+//     CHECK_HIP_ERROR(hipMalloc(&d_b, bytesB));
+//     CHECK_HIP_ERROR(hipMalloc(&d_d, bytesD));
 
-    CHECK_HIP_ERROR(hipMemcpy(d_a, matrixA.data(), bytesA, hipMemcpyHostToDevice));
-    CHECK_HIP_ERROR(hipMemcpy(d_b, matrixB.data(), bytesB, hipMemcpyHostToDevice));
-    CHECK_HIP_ERROR(hipMemcpy(d_d, matrixD.data(), bytesD, hipMemcpyHostToDevice));
+//     CHECK_HIP_ERROR(hipMemcpy(d_a, matrixA.data(), bytesA, hipMemcpyHostToDevice));
+//     CHECK_HIP_ERROR(hipMemcpy(d_b, matrixB.data(), bytesB, hipMemcpyHostToDevice));
+//     CHECK_HIP_ERROR(hipMemcpy(d_d, matrixD.data(), bytesD, hipMemcpyHostToDevice));
 
-    auto blockDim = dim3(hTBLOCK_X, hTBLOCK_Y);
-    auto tilesM  = rocwmma::ceilDiv(m, get<0>(macroTileSize));
-    auto tilesN  = rocwmma::ceilDiv(n, get<1>(macroTileSize));
-    auto gridDim  = dim3(tilesM * tilesN, 1, 1);
+//     auto blockDim = dim3(hTBLOCK_X, hTBLOCK_Y);
+//     auto tilesM  = rocwmma::ceilDiv(m, get<0>(macroTileSize));
+//     auto tilesN  = rocwmma::ceilDiv(n, get<1>(macroTileSize));
+//     auto gridDim  = dim3(tilesM * tilesN, 1, 1);
 
-    std::cout << "Launching GEMM kernel..." << std::endl;
-    std::cout << "gridDim (" << gridDim.x << " " << gridDim.y << " " << gridDim.z << ")"
-              << " blockdim (" << blockDim.x << " " << blockDim.y << ")" << std::endl;
+//     std::cout << "Launching GEMM kernel..." << std::endl;
+//     std::cout << "gridDim (" << gridDim.x << " " << gridDim.y << " " << gridDim.z << ")"
+//               << " blockdim (" << blockDim.x << " " << blockDim.y << ")" << std::endl;
 
-    // Uses 2 lds blocks for prefetch loop (A and B)
-    int ldsusage
-        = 2u * sizeof(InputT) * (get<0>(macroTileSize) + get<1>(macroTileSize)) * hROCWMMA_K;
+//     // Uses 2 lds blocks for prefetch loop (A and B)
+//     int ldsusage
+//         = 2u * sizeof(InputT) * (get<0>(macroTileSize) + get<1>(macroTileSize)) * hROCWMMA_K;
 
-    ////
-    auto rocwmmaKernel = [&]() {
-        hipExtLaunchKernelGGL(sv_gemm,
-                              gridDim,
-                              blockDim,
-                              ldsusage,
-                              0,
-                              nullptr,
-                              nullptr,
-                              0,
-                              m,
-                              n,
-                              k,
-                              d_a,
-                              d_b,
-                              d_d,
-                              lda,
-                              ldb,
-                              ldd);
-    };
+//     ////
+//     auto rocwmmaKernel = [&]() {
+//         hipExtLaunchKernelGGL(sv_gemm,
+//                               gridDim,
+//                               blockDim,
+//                               ldsusage,
+//                               0,
+//                               nullptr,
+//                               nullptr,
+//                               0,
+//                               m,
+//                               n,
+//                               k,
+//                               d_a,
+//                               d_b,
+//                               d_d,
+//                               lda,
+//                               ldb,
+//                               ldd);
+//     };
 
-    constexpr uint32_t warmups    = 2u;
-    constexpr uint32_t recordRuns = 5u;
+//     constexpr uint32_t warmups    = 2u;
+//     constexpr uint32_t recordRuns = 5u;
 
-    // Warm-up runs, not recorded
-    for(uint32_t i = 0; i < warmups; ++i)
-    {
-        rocwmmaKernel();
-    }
+//     // Warm-up runs, not recorded
+//     for(uint32_t i = 0; i < warmups; ++i)
+//     {
+//         rocwmmaKernel();
+//     }
 
-    // Actual recorded runs
-    hipEvent_t startEvent, stopEvent;
-    CHECK_HIP_ERROR(hipEventCreate(&startEvent));
-    CHECK_HIP_ERROR(hipEventCreate(&stopEvent));
+//     // Actual recorded runs
+//     hipEvent_t startEvent, stopEvent;
+//     CHECK_HIP_ERROR(hipEventCreate(&startEvent));
+//     CHECK_HIP_ERROR(hipEventCreate(&stopEvent));
 
-    CHECK_HIP_ERROR(hipEventRecord(startEvent));
-    for(uint32_t i = 0; i < recordRuns; ++i)
-    {
-        rocwmmaKernel();
-    }
-    CHECK_HIP_ERROR(hipEventRecord(stopEvent));
-    CHECK_HIP_ERROR(hipEventSynchronize(stopEvent));
+//     CHECK_HIP_ERROR(hipEventRecord(startEvent));
+//     for(uint32_t i = 0; i < recordRuns; ++i)
+//     {
+//         rocwmmaKernel();
+//     }
+//     CHECK_HIP_ERROR(hipEventRecord(stopEvent));
+//     CHECK_HIP_ERROR(hipEventSynchronize(stopEvent));
 
-    auto elapsedTimeMs = 0.0f;
-    CHECK_HIP_ERROR(hipEventElapsedTime(&elapsedTimeMs, startEvent, stopEvent));
+//     auto elapsedTimeMs = 0.0f;
+//     CHECK_HIP_ERROR(hipEventElapsedTime(&elapsedTimeMs, startEvent, stopEvent));
 
-    auto gFlops = calculateGFlops(m, n, k);
-    auto tFlopsPerSec
-        = calculateTFlopsPerSec(m, n, k, static_cast<double>(elapsedTimeMs), recordRuns);
+//     auto gFlops = calculateGFlops(m, n, k);
+//     auto tFlopsPerSec
+//         = calculateTFlopsPerSec(m, n, k, static_cast<double>(elapsedTimeMs), recordRuns);
 
-    CHECK_HIP_ERROR(hipEventDestroy(startEvent));
-    CHECK_HIP_ERROR(hipEventDestroy(stopEvent));
+//     CHECK_HIP_ERROR(hipEventDestroy(startEvent));
+//     CHECK_HIP_ERROR(hipEventDestroy(stopEvent));
 
-    // Echo performance
-    std::cout << "TBlockX, TBlockY, "
-              << "BlocksX, BlocksY, "
-              << "BlkM, BlkN, BlkK, "
-              << "MatM, MatN, MatK, "
-              << "lda, ldb, ldd,"
-              << "elapsedus, Problem Size(GFlops), TFlops/s" << "," << "sizeof(intputT)" << std::endl;
+//     // Echo performance
+//     std::cout << "TBlockX, TBlockY, "
+//               << "BlocksX, BlocksY, "
+//               << "BlkM, BlkN, BlkK, "
+//               << "MatM, MatN, MatK, "
+//               << "lda, ldb, ldd,"
+//               << "elapsedus, Problem Size(GFlops), TFlops/s" << "," << "sizeof(intputT)" << std::endl;
 
-    std::cout << hTBLOCK_X << ", " << hTBLOCK_Y << ", " << hBLOCKS_X << ", " << hBLOCKS_Y << ", "
-              << hROCWMMA_M << ", " << hROCWMMA_N << ", " << hROCWMMA_K << ", " << m << ", " << n
-              << ", " << k  << ", " << lda << ", " << ldb << ", " << ldd << ", " << elapsedTimeMs * 200<< ", " << gFlops << ", "
-              << tFlopsPerSec << "," << sizeof(InputT) << std::endl;
+//     std::cout << hTBLOCK_X << ", " << hTBLOCK_Y << ", " << hBLOCKS_X << ", " << hBLOCKS_Y << ", "
+//               << hROCWMMA_M << ", " << hROCWMMA_N << ", " << hROCWMMA_K << ", " << m << ", " << n
+//               << ", " << k  << ", " << lda << ", " << ldb << ", " << ldd << ", " << elapsedTimeMs * 200<< ", " << gFlops << ", "
+//               << tFlopsPerSec << "," << sizeof(InputT) << std::endl;
 
-#if !NDEBUG
+// #if !NDEBUG
 
-    std::cout << "Validating result with reference..." << std::endl;
+//     std::cout << "Validating result with reference..." << std::endl;
 
-    if((uint64_t)m * (uint64_t)n * (uint64_t)k > (2048ull * 2048ull * 2048ull))
-    {
-        std::cout << "Please wait. Large sizes can take a while!" << std::endl;
-    }
+//     if((uint64_t)m * (uint64_t)n * (uint64_t)k > (2048ull * 2048ull * 2048ull))
+//     {
+//         std::cout << "Please wait. Large sizes can take a while!" << std::endl;
+//     }
 
-    // Bring kernel result back to host
-    CHECK_HIP_ERROR(hipMemcpy(matrixD.data(), d_d, bytesD, hipMemcpyDeviceToHost));
+//     // Bring kernel result back to host
+//     CHECK_HIP_ERROR(hipMemcpy(matrixD.data(), d_d, bytesD, hipMemcpyDeviceToHost));
 
-    // Setup and run reference computation
-    std::vector<OutputT> matrixD_ref(m * n, std::numeric_limits<OutputT>::signaling_NaN());
-    gemm_cpu_h<InputT, OutputT, ComputeT, DataLayoutS, DataLayoutV, DataLayoutO>(m,
-                                                                                 n,
-                                                                                 k,
-                                                                                 matrixA.data(),
-                                                                                 matrixB.data(),
-                                                                                 matrixD_ref.data(),
-                                                                                 lda,
-                                                                                 ldb,
-                                                                                 ldd);
-    std::cout<<"calculation finished"<<std::endl;
-    auto res = compareEqual(matrixD.data(), matrixD_ref.data(), m * n);
+//     // Setup and run reference computation
+//     std::vector<OutputT> matrixD_ref(m * n, std::numeric_limits<OutputT>::signaling_NaN());
+//     gemm_cpu_h<InputT, OutputT, ComputeT, DataLayoutS, DataLayoutV, DataLayoutO>(m,
+//                                                                                  n,
+//                                                                                  k,
+//                                                                                  matrixA.data(),
+//                                                                                  matrixB.data(),
+//                                                                                  matrixD_ref.data(),
+//                                                                                  lda,
+//                                                                                  ldb,
+//                                                                                  ldd);
+//     std::cout<<"calculation finished"<<std::endl;
+//     auto res = compareEqual(matrixD.data(), matrixD_ref.data(), m * n);
 
-    if(std::get<0>(res) == false)
-    {
-        std::cout << "FAILED\n";
-    }
-    else
-    {
-        std::cout << "PASSED\n";
-    }
+//     if(std::get<0>(res) == false)
+//     {
+//         std::cout << "FAILED\n";
+//     }
+//     else
+//     {
+//         std::cout << "PASSED\n";
+//     }
 
-    std::cout << "Max relative error: " << std::get<1>(res) << std::endl;
+//     std::cout << "Max relative error: " << std::get<1>(res) << std::endl;
 
-#endif // !NDEBUG
+// #endif // !NDEBUG
 
-    // Release device memory
-    CHECK_HIP_ERROR(hipFree(d_a));
-    CHECK_HIP_ERROR(hipFree(d_b));
-    CHECK_HIP_ERROR(hipFree(d_d));
+//     // Release device memory
+//     CHECK_HIP_ERROR(hipFree(d_a));
+//     CHECK_HIP_ERROR(hipFree(d_b));
+//     CHECK_HIP_ERROR(hipFree(d_d));
 
-    std::cout << "Finished!" << std::endl;
-}
+//     std::cout << "Finished!" << std::endl;
+// }
 
-int main()
-{
-    simple_ge1d(4096, 4096, 4096);
-    return 0;
-}
+// int main()
+// {
+//     simple_ge1d(4096, 4096, 4096);
+//     return 0;
+// }

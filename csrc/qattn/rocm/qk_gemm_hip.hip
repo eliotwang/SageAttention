@@ -450,19 +450,13 @@ ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_
 
         // Global matrix coordinates for C/D
                 // Linearize tile mapping into blockIdx.x (grid can be 3D; y/z reserved for batch/head)
-        const uint32_t tilesM = (qo_len + get<0>(macroTileSize) - 1u) / get<0>(macroTileSize);
-        const uint32_t lin    = blockIdx.x;
-        const uint32_t tileM  = lin % tilesM;
-        const uint32_t tileN  = lin / tilesM;
-        auto macroTileCoord   = make_coord2d(tileM, tileN) * macroTileSize;
-        auto warpTileCoord  = macroTileCoord + localWarpOffset;
+        // const uint32_t tilesM = (qo_len + get<0>(macroTileSize) - 1u) / get<0>(macroTileSize);
+        // const uint32_t lin    = blockIdx.x;
+        // const uint32_t tileM  = lin % tilesM;
+        // const uint32_t tileN  = lin / tilesM;
+        // auto macroTileCoord   = make_coord2d(tileM, tileN) * macroTileSize;
+        // auto warpTileCoord  = macroTileCoord + localWarpOffset;
 
-        // Bounds check
-        auto warpTileBound = warpTileCoord + warpTileSize;
-        if(get<0>(warpTileBound) > qo_len || get<1>(warpTileBound) > kv_len)
-        {
-            return;
-        }
 
         const uint32_t batch_id = blockIdx.z;
         const uint32_t bx = blockIdx.x;
@@ -475,10 +469,19 @@ ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_
                 : kv_len,
             CTA_K);
 
-        // T += batch_id * stride_bz_t + head_id * stride_h_t + bx * CTA_Q * stride_seq_t;
-        T += batch_id * stride_bz_t + head_id * stride_h_t;
+        auto outptr = T + batch_id * stride_bz_t + head_id * stride_h_t;
+        // T += batch_id * stride_bz_t + head_id * stride_h_t;
         for (uint32_t iter = 0; iter < num_iterations ; iter++)
         {
+            auto macroTileCoord   = make_coord2d(bx, iter) * macroTileSize;
+            auto warpTileCoord  = macroTileCoord + localWarpOffset;
+
+            // Bounds check
+            auto warpTileBound = warpTileCoord + warpTileSize;
+            if(get<0>(warpTileBound) > qo_len || get<1>(warpTileBound) > kv_len)
+            {
+                return;
+            }
             ///
             /// 1D global read coordinate setup
             ///
@@ -487,11 +490,9 @@ ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_
 
             // Initial globa read address offsets
             auto globalReadOffsetA
-                = batch_id * stride_bz_q + head_id * stride_h_q
-                + GRBuffQMap1d::fromMatrixCoord(make_coord2d(get<0>(macroTileCoord), 0u), lda);
+                = batch_id * stride_bz_q + head_id * stride_h_q + bx * MACRO_TILE_X;
             auto globalReadOffsetB
-                = batch_id * stride_bz_k + (head_id / num_kv_groups) * stride_h_k + iter * CTA_K * stride_seq_k 
-                + GRBuffKMap1d::fromMatrixCoord(make_coord2d(0u, get<1>(macroTileCoord)), ldb);
+                = batch_id * stride_bz_k + (head_id / num_kv_groups) * stride_h_k + iter * MACRO_TILE_Y;
 
             // Incremental global read address offsets
             auto kStepOffsetA = GRBuffQMap1d::fromMatrixCoord(make_coord2d(0u, ROCWMMA_K), lda);
@@ -649,8 +650,8 @@ ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_
             ///
             // MfmaFragD fragsD[BLOCKS_X][BLOCKS_Y];
             // uniformFma(fragsD, alpha, fragsAcc, beta, fragsC);
-            globalWriteD(T + MfmaFragDMap1d::fromMatrixCoord(warpTileCoord, ldd), fragsAcc, ldd);
-            // T += CTA_K;//
+            globalWriteD(outptr + MfmaFragDMap1d::fromMatrixCoord(warpTileCoord, ldd), fragsAcc, ldd);
+            // outptr += CTA_K;//
         }
     }
 }

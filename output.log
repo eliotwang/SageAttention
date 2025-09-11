@@ -1,0 +1,1844 @@
+running clean
+removing 'build/temp.linux-x86_64-cpython-312' (and everything under it)
+[H[2J[3JCUDA not detected (either CUDA_HOME is None or torch.cuda is not available). CUDA extensions will be skipped.
+setup.py: ignoring env HCC_AMDGPU_TARGET=gfx942
+/home/SageAttention/csrc/qattn/rocm/attn_rocm_gfx942.h -> /home/SageAttention/csrc/qattn/rocm/attn_rocm_gfx942.h [skipped, no changes]
+/home/SageAttention/csrc/qattn/rocm/pybind_gfx942.cpp -> /home/SageAttention/csrc/qattn/rocm/pybind_gfx942.cpp [skipped, no changes]
+/home/SageAttention/csrc/utils.cuh -> /home/SageAttention/csrc/utils.cuh [skipped, no changes]
+/home/SageAttention/csrc/qattn/rocm/attn_utils.h -> /home/SageAttention/csrc/qattn/rocm/attn_utils_hip.h [skipped, already hipified]
+/home/SageAttention/csrc/dispatch_utils.h -> /home/SageAttention/csrc/dispatch_utils.h [skipped, no changes]
+/home/SageAttention/csrc/qattn/rocm/common.hpp -> /home/SageAttention/csrc/qattn/rocm/common.hpp [skipped, no changes]
+/home/SageAttention/csrc/qattn/rocm/qk_gemm.hip -> /home/SageAttention/csrc/qattn/rocm/qk_gemm_hip.hip [skipped, already hipified]
+/home/SageAttention/csrc/qattn/rocm/sv_gemm.hip -> /home/SageAttention/csrc/qattn/rocm/sv_gemm_hip.hip [skipped, already hipified]
+/home/SageAttention/csrc/qattn/rocm/gfx942.hip -> /home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip [skipped, already hipified]
+Total number of unsupported CUDA function calls: 0
+
+
+Total number of replaced kernel launches: 2
+/home/SageAttention/csrc/fused/fused.h -> /home/SageAttention/csrc/fused/fused.h [skipped, no changes]
+/home/SageAttention/csrc/fused/pybind_hip.cpp -> /home/SageAttention/csrc/fused/pybind_hip.cpp [skipped, no changes]
+/home/SageAttention/csrc/reduction_utils.h -> /home/SageAttention/csrc/reduction_utils_hip.h [skipped, already hipified]
+/home/SageAttention/csrc/numeric_conversion.cuh -> /home/SageAttention/csrc/numeric_conversion_hip.cuh [skipped, already hipified]
+/home/SageAttention/csrc/fused/fused.hip -> /home/SageAttention/csrc/fused/fused_hip.hip [skipped, already hipified]
+Total number of unsupported CUDA function calls: 0
+
+
+Total number of replaced kernel launches: 2
+running install
+running bdist_egg
+running egg_info
+writing sageattention.egg-info/PKG-INFO
+writing dependency_links to sageattention.egg-info/dependency_links.txt
+writing top-level names to sageattention.egg-info/top_level.txt
+adding license file 'LICENSE'
+writing manifest file 'sageattention.egg-info/SOURCES.txt'
+installing library code to build/bdist.linux-x86_64/egg
+running install_lib
+running build_py
+creating build/lib.linux-x86_64-cpython-312/sageattention
+copying sageattention/__init__.py -> build/lib.linux-x86_64-cpython-312/sageattention
+copying sageattention/quant.py -> build/lib.linux-x86_64-cpython-312/sageattention
+copying sageattention/core.py -> build/lib.linux-x86_64-cpython-312/sageattention
+copying sageattention/fa3_wrapper.py -> build/lib.linux-x86_64-cpython-312/sageattention
+creating build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/attn_qk_int8_per_block_causal.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/quant_per_thread.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/quant_per_block_varlen.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/attn_qk_int8_per_thread_causal.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/__init__.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/attn_qk_int8_per_block_causal_varlen.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/get_scroe.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/attn_qk_int8_per_block.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/attn_qk_int8_block_varlen.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/attn_qk_int8_per_thread.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+copying sageattention/triton/quant_per_block.py -> build/lib.linux-x86_64-cpython-312/sageattention/triton
+running build_ext
+building 'sageattention._qattn_rocm' extension
+building 'sageattention._fused' extension
+creating /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm
+creating /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._fused/csrc/fused
+[1/4] /opt/rocm-6.3.0/bin/hipcc  -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c /home/SageAttention/csrc/qattn/rocm/qk_gemm_hip.hip -o /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/qk_gemm_hip.o -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -DCUDA_HAS_FP16=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -O3 -g -ggdb -std=c++17 --offload-arch=gfx942 -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1016"' -DTORCH_EXTENSION_NAME=_qattn_rocm -D_GLIBCXX_USE_CXX11_ABI=1 -fno-gpu-rdc
+FAILED: /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/qk_gemm_hip.o 
+/opt/rocm-6.3.0/bin/hipcc  -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c /home/SageAttention/csrc/qattn/rocm/qk_gemm_hip.hip -o /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/qk_gemm_hip.o -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -DCUDA_HAS_FP16=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -O3 -g -ggdb -std=c++17 --offload-arch=gfx942 -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1016"' -DTORCH_EXTENSION_NAME=_qattn_rocm -D_GLIBCXX_USE_CXX11_ABI=1 -fno-gpu-rdc
+/home/SageAttention/csrc/qattn/rocm/qk_gemm_hip.hip:461:30: error: use of undeclared identifier 'warpTileCoord'; did you mean 'warpTileSize'?
+  461 |         auto warpTileBound = warpTileCoord + warpTileSize;
+      |                              ^~~~~~~~~~~~~
+      |                              warpTileSize
+/home/SageAttention/csrc/qattn/rocm/qk_gemm_hip.hip:443:24: note: 'warpTileSize' declared here
+  443 |         constexpr auto warpTileSize  = make_coord2d(WARP_TILE_X, WARP_TILE_Y);  //(64,64)
+      |                        ^
+1 error generated when compiling for gfx942.
+failed to execute:/opt/rocm-6.3.0/lib/llvm/bin/clang++  --offload-arch=gfx942  -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c -x hip /home/SageAttention/csrc/qattn/rocm/qk_gemm_hip.hip -o "/home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/qk_gemm_hip.o" -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -DCUDA_HAS_FP16=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -O3 -g -ggdb -std=c++17 -DTORCH_API_INCLUDE_EXTENSION_H -DPYBIND11_COMPILER_TYPE=\"_gcc\" -DPYBIND11_STDLIB=\"_libstdcpp\" -DPYBIND11_BUILD_ABI=\"_cxxabi1016\" -DTORCH_EXTENSION_NAME=_qattn_rocm -D_GLIBCXX_USE_CXX11_ABI=1 -fno-gpu-rdc
+[2/4] /opt/rocm-6.3.0/bin/hipcc  -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c /home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip -o /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/gfx942_hip.o -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -DCUDA_HAS_FP16=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -O3 -g -ggdb -std=c++17 --offload-arch=gfx942 -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1016"' -DTORCH_EXTENSION_NAME=_qattn_rocm -D_GLIBCXX_USE_CXX11_ABI=1 -fno-gpu-rdc
+FAILED: /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/gfx942_hip.o 
+/opt/rocm-6.3.0/bin/hipcc  -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c /home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip -o /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/gfx942_hip.o -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -DCUDA_HAS_FP16=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -O3 -g -ggdb -std=c++17 --offload-arch=gfx942 -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1016"' -DTORCH_EXTENSION_NAME=_qattn_rocm -D_GLIBCXX_USE_CXX11_ABI=1 -fno-gpu-rdc
+In file included from /home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:2:
+/home/SageAttention/csrc/qattn/rocm/qk_gemm_hip.hip:461:30: error: use of undeclared identifier 'warpTileCoord'; did you mean 'warpTileSize'?
+  461 |         auto warpTileBound = warpTileCoord + warpTileSize;
+      |                              ^~~~~~~~~~~~~
+      |                              warpTileSize
+/home/SageAttention/csrc/qattn/rocm/qk_gemm_hip.hip:443:24: note: 'warpTileSize' declared here
+  443 |         constexpr auto warpTileSize  = make_coord2d(WARP_TILE_X, WARP_TILE_Y);  //(64,64)
+      |                        ^
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:153:3: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  153 |   hipEventCreate(&ev_qk_s); hipEventCreate(&ev_qk_e);
+      |   ^~~~~~~~~~~~~~ ~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:153:29: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  153 |   hipEventCreate(&ev_qk_s); hipEventCreate(&ev_qk_e);
+      |                             ^~~~~~~~~~~~~~ ~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:154:3: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  154 |   hipEventCreate(&ev_soft_s); hipEventCreate(&ev_soft_e);
+      |   ^~~~~~~~~~~~~~ ~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:154:31: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  154 |   hipEventCreate(&ev_soft_s); hipEventCreate(&ev_soft_e);
+      |                               ^~~~~~~~~~~~~~ ~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:155:3: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  155 |   hipEventCreate(&ev_sv_s); hipEventCreate(&ev_sv_e);
+      |   ^~~~~~~~~~~~~~ ~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:155:29: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  155 |   hipEventCreate(&ev_sv_s); hipEventCreate(&ev_sv_e);
+      |                             ^~~~~~~~~~~~~~ ~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:26:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   26 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:39:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   39 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:52:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   52 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:65:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   65 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:78:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   78 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:193:13: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  193 |             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |             ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:222:17: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  222 |                 hipStreamSynchronize(TORCH_STREAM);
+      |                 ^~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip:405:15: warning: ignoring return value of function declared with 'nodiscard' attribute [-Wunused-result]
+  405 |               hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_sv), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
+      |               ^~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:81:5: note: expanded from macro 'DISPATCH_PYTORCH_DTYPE_TO_CTYPE_FP16'
+   81 |     __VA_ARGS__                                                                         \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:68:5: note: expanded from macro 'DISPATCH_RETURN_LSE'
+   68 |     __VA_ARGS__                                                  \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:55:5: note: expanded from macro 'DISPATCH_QK_QUANT_GRAN'
+   55 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:42:5: note: expanded from macro 'DISPATCH_CAUSAL'
+   42 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+/home/SageAttention/csrc/qattn/rocm/../../dispatch_utils.h:29:5: note: expanded from macro 'DISPATCH_HEAD_DIM'
+   29 |     __VA_ARGS__                                                 \
+      |     ^~~~~~~~~~~
+102 warnings and 1 error generated when compiling for gfx942.
+failed to execute:/opt/rocm-6.3.0/lib/llvm/bin/clang++  --offload-arch=gfx942  -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c -x hip /home/SageAttention/csrc/qattn/rocm/gfx942_hip.hip -o "/home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/gfx942_hip.o" -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -DCUDA_HAS_FP16=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -O3 -g -ggdb -std=c++17 -DTORCH_API_INCLUDE_EXTENSION_H -DPYBIND11_COMPILER_TYPE=\"_gcc\" -DPYBIND11_STDLIB=\"_libstdcpp\" -DPYBIND11_BUILD_ABI=\"_cxxabi1016\" -DTORCH_EXTENSION_NAME=_qattn_rocm -D_GLIBCXX_USE_CXX11_ABI=1 -fno-gpu-rdc
+[1/2] c++ -MMD -MF /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._fused/csrc/fused/pybind_hip.o.d -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -g -fstack-protector-strong -Wformat -Werror=format-security -g -fwrapv -O2 -fPIC -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c /home/SageAttention/csrc/fused/pybind_hip.cpp -o /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._fused/csrc/fused/pybind_hip.o -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -O3 -fPIC -std=c++17 -DUSE_ROCM=1 -D__HIP_PLATFORM_AMD__=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -DHIPBLAS_V2 -D_GLIBCXX_USE_CXX11_ABI=1 -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1016"' -DTORCH_EXTENSION_NAME=_fused -D_GLIBCXX_USE_CXX11_ABI=1
+[3/4] c++ -MMD -MF /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/pybind_gfx942.o.d -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -g -fstack-protector-strong -Wformat -Werror=format-security -g -fwrapv -O2 -fPIC -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c /home/SageAttention/csrc/qattn/rocm/pybind_gfx942.cpp -o /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/pybind_gfx942.o -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -O3 -fPIC -std=c++17 -DUSE_ROCM=1 -D__HIP_PLATFORM_AMD__=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -DHIPBLAS_V2 -D_GLIBCXX_USE_CXX11_ABI=1 -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1016"' -DTORCH_EXTENSION_NAME=_qattn_rocm -D_GLIBCXX_USE_CXX11_ABI=1
+[2/2] /opt/rocm-6.3.0/bin/hipcc  -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c /home/SageAttention/csrc/fused/fused_hip.hip -o /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._fused/csrc/fused/fused_hip.o -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -DCUDA_HAS_FP16=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -O3 -g -ggdb -std=c++17 --offload-arch=gfx942 -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1016"' -DTORCH_EXTENSION_NAME=_fused -D_GLIBCXX_USE_CXX11_ABI=1 -fno-gpu-rdc
+/home/SageAttention/csrc/fused/fused_hip.hip:17:9: warning: #pragma once in main file [-Wpragma-once-outside-header]
+   17 | #pragma once
+      |         ^
+1 warning generated when compiling for gfx942.
+/home/SageAttention/csrc/fused/fused_hip.hip:17:9: warning: #pragma once in main file [-Wpragma-once-outside-header]
+   17 | #pragma once
+      |         ^
+1 warning generated when compiling for host.
+x86_64-linux-gnu-g++ -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O2 -Wall -g -fstack-protector-strong -Wformat -Werror=format-security -g -fwrapv -O2 -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -g -fwrapv -O2 /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._fused/csrc/fused/fused_hip.o /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._fused/csrc/fused/pybind_hip.o -L/opt/rocm-6.3.0/lib -L/opt/rocm-6.3.0/lib64 -L/usr/local/lib/python3.12/dist-packages/torch/lib -L/usr/local/lib/python3.12/dist-packages/torch/lib -L/opt/rocm-6.3.0/lib -L/opt/rocm-6.3.0/hip/lib -L/usr/lib/x86_64-linux-gnu -Wl,--enable-new-dtags,-rpath,/opt/rocm-6.3.0/lib -Wl,--enable-new-dtags,-rpath,/opt/rocm-6.3.0/lib64 -Wl,--enable-new-dtags,-rpath,/usr/local/lib/python3.12/dist-packages/torch/lib -lamdhip64 -lhiprtc -lrocblas -lhipblas -lc10 -ltorch -ltorch_cpu -ltorch_python -lamdhip64 -lc10_hip -ltorch_hip -o build/lib.linux-x86_64-cpython-312/sageattention/_fused.cpython-312-x86_64-linux-gnu.so
+[4/4] /opt/rocm-6.3.0/bin/hipcc  -Ithird_party/rocwmma/library/include -I/opt/rocm-6.3.0/include -I/opt/rocm-6.3.0/include/hip -I/usr/local/lib/python3.12/dist-packages/torch/include -I/usr/local/lib/python3.12/dist-packages/torch/include/torch/csrc/api/include -I/usr/local/lib/python3.12/dist-packages/torch/include/TH -I/usr/local/lib/python3.12/dist-packages/torch/include/THC -I/usr/local/lib/python3.12/dist-packages/torch/include/THH -I/opt/rocm-6.3.0/include -I/usr/include/python3.12 -c -c /home/SageAttention/csrc/qattn/rocm/sv_gemm_hip.hip -o /home/SageAttention/build/temp.linux-x86_64-cpython-312/sageattention._qattn_rocm/csrc/qattn/rocm/sv_gemm_hip.o -fPIC -D__HIP_PLATFORM_AMD__=1 -DUSE_ROCM=1 -DHIPBLAS_V2 -DCUDA_HAS_FP16=1 -D__HIP_NO_HALF_OPERATORS__=1 -D__HIP_NO_HALF_CONVERSIONS__=1 -O3 -g -ggdb -std=c++17 --offload-arch=gfx942 -DTORCH_API_INCLUDE_EXTENSION_H '-DPYBIND11_COMPILER_TYPE="_gcc"' '-DPYBIND11_STDLIB="_libstdcpp"' '-DPYBIND11_BUILD_ABI="_cxxabi1016"' -DTORCH_EXTENSION_NAME=_qattn_rocm -D_GLIBCXX_USE_CXX11_ABI=1 -fno-gpu-rdc
+ninja: build stopped: subcommand failed.

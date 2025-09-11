@@ -15,6 +15,15 @@
   #define DEVICE_GUARD  at::hip::HIPGuardMasqueradingAsCUDA device_guard(query.device());
 #endif
 
+#include <atomic>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fstream>
+
+#include <torch/serialize.h>
+#include <torch/serialize/tensor.h>
+
 torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
                     torch::Tensor key,
                     torch::Tensor value,
@@ -112,7 +121,7 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
   
   int lda = qo_len;
   int ldb = kv_len;
-  int ldd = kv_len; //budui
+  int ldd = kv_len;
   if (num_qo_heads % num_kv_heads != 0) {
     std::ostringstream err_msg;
     err_msg << "num_qo_heads (" << num_qo_heads << ") must be divisible by num_kv_heads (" << num_kv_heads << ")";
@@ -178,7 +187,7 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
             //                                     smem_Q                                     smem_K                            smem_V                     smem_O
             size_t smem_max = std::max(CTA_Q * HEAD_DIM * sizeof(int8_t) + CTA_K * HEAD_DIM * sizeof(int8_t) + CTA_K * HEAD_DIM * sizeof(int8_t), CTA_Q * HEAD_DIM * sizeof(half));
             
-            auto kernel_func_qk = qk_gemm<CTA_Q, CTA_K, WARP_Q, WARP_K, HEAD_DIM, DataType::kInt8, static_cast<QuantGranularity>(QK_QUANT_GRAN), static_cast<QuantGranularity>(QK_QUANT_GRAN),
+            auto kernel_func_qk = qk_gemm<CTA_Q, 128, WARP_Q, WARP_K, HEAD_DIM, DataType::kInt8, static_cast<QuantGranularity>(QK_QUANT_GRAN), static_cast<QuantGranularity>(QK_QUANT_GRAN),
                                                         float, false, DTypeOut, ComputeUnit::kCudaCore, mask_mode, RETURN_LSE, false, false, false>;
 
             hipFuncSetAttribute(reinterpret_cast<const void*>(kernel_func_qk), hipFuncAttributeMaxDynamicSharedMemorySize, smem_max);
@@ -199,7 +208,48 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
               stride_bz_t, stride_seq_t, stride_h_t,
               lda, ldb, ldd);
             // hipEventRecord(ev_qk_e, stream);
+             {
+              static const char* kMarkerPath = "/home/tmp/qkroc/qk_first.marker";
+              static const char* kDumpPath   = "/home/tmp/qkroc/qk_int32_first.pt";
 
+              // 用“原子创建文件”做跨进程一次性保护
+              int fd = ::open(kMarkerPath, O_CREAT | O_EXCL | O_WRONLY, 0644);
+              if (fd >= 0) {
+                ::write(fd, "saved\n", 6);
+                ::close(fd);
+
+                // 等 QK kernel 结束，确保 t_f32 可读
+                hipStreamSynchronize(TORCH_STREAM);
+
+                // 把 t_f32 视为 [B, H_qo, qo_len, kv_len]
+                std::array<int64_t,4> sizes{batch_size, num_qo_heads, qo_len, kv_len};
+                at::Tensor logits_i32;
+                if (t_f32.sizes() == at::IntArrayRef(sizes)) {
+                  logits_i32 = t_f32;
+                } else if (t_f32.is_contiguous()) {
+                  logits_i32 = t_f32.view(sizes);
+                } else {
+                  std::array<int64_t,4> strides_t{stride_bz_t, stride_h_t, stride_seq_t, 1};
+                  logits_i32 = t_f32.as_strided(sizes, strides_t);
+                }
+
+                // 拷到 CPU 后保存（整张矩阵）
+                auto cpu_t = logits_i32.to(at::kCPU).contiguous();
+                try {
+                  torch::save(cpu_t, kDumpPath);
+                  printf("[QK-DUMP] saved full int32 QK (t) to %s\n", kDumpPath);
+                } catch (const std::exception& e) {
+                  fprintf(stderr, "[QK-DUMP] torch::save failed: %s\n", e.what());
+                  // 兜底：保存为原始二进制
+                  std::ofstream ofs("/home/SageAttention/qk_int32_first.bin", std::ios::binary);
+                  ofs.write(reinterpret_cast<const char*>(cpu_t.data_ptr<int32_t>()),
+                            cpu_t.numel() * sizeof(int32_t));
+                  ofs.close();
+                  printf("[QK-DUMP] wrote raw .bin fallback to /home/SageAttention/qk_int32_first.bin\n");
+                }
+              }
+              // 若 fd<0，说明别的进程/此前调用已保存过，直接跳过
+            }
             // hipEventRecord(ev_soft_s, stream);
               //softmax
               // ---------- build logits from t_f32 (int32) → dequantize by Q/K scales → base-2 softmax ----------
@@ -283,6 +333,53 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
                 //TORCH_CHECK(row_sum.sub(1.0).abs().max().item<float>() < 1e-2, "softmax row_sum deviates from 1");
               at::Tensor s = probs.to(at::kFloat8_e4m3fnuz).contiguous();
 
+              // {
+              //   static const char* kMarkerPath = "/home/tmp/qk_files/softmax_first.marker";
+              //   int fd = ::open(kMarkerPath, O_CREAT | O_EXCL | O_WRONLY, 0644);
+              //   if (fd >= 0) {
+              //     ::write(fd, "saved\n", 6);
+              //     ::close(fd);
+
+              //     hipStreamSynchronize(TORCH_STREAM);  // 确保 logits/probs/s 已就绪
+
+              //     // 1) 反量化+1/sqrt(d) 之后的 logits（float32）
+              //     try {
+              //       auto logits_cpu = logits.to(at::kCPU).contiguous();  // [B,H,qo_len,kv_len], float
+              //       torch::save(logits_cpu, "/home/tmp/qk_files/qk_logits_deq_first.pt");
+              //       printf("[QK-DUMP] saved dequantized logits to /home/tmp/qk_files/qk_logits_deq_first.pt\n");
+              //     } catch (const std::exception& e) {
+              //       fprintf(stderr, "[QK-DUMP] save logits failed: %s\n", e.what());
+              //     }
+
+              //     // 2) softmax 后的概率（float32）
+              //     try {
+              //       auto probs_cpu = probs.to(at::kCPU).contiguous();    // [B,H,qo_len,kv_len], float
+              //       torch::save(probs_cpu, "/home/tmp/qk_files/qk_probs_first.pt");
+              //       printf("[QK-DUMP] saved softmax probs to /home/tmp/qk_files/qk_probs_first.pt\n");
+              //     } catch (const std::exception& e) {
+              //       fprintf(stderr, "[QK-DUMP] save probs failed: %s\n", e.what());
+              //     }
+
+              //     // 3) 概率的 FP8 量化版本（可选，方便核对你的 SV 路径输入）
+              //     try {
+              //       auto s_cpu = s.to(at::kCPU).contiguous();            // [B,H,qo_len,kv_len], float8_e4m3fnuz
+              //       torch::save(s_cpu, "/home/tmp/qk_files/qk_probs_fp8_first.pt");
+              //       printf("[QK-DUMP] saved probs(FP8) to /home/tmp/qk_files/qk_probs_fp8_first.pt\n");
+              //     } catch (const std::exception& e) {
+              //       fprintf(stderr, "[QK-DUMP] save probs(FP8) failed: %s\n", e.what());
+              //       // 兜底：转回 float 再存
+              //       try {
+              //         auto s_as_f32_cpu = s.to(at::kFloat).to(at::kCPU).contiguous();
+              //         torch::save(s_as_f32_cpu, "/home/tmp/qk_files/qk_probs_fp8_as_float_first.pt");
+              //         printf("[QK-DUMP] saved probs(FP8->float) to /home/tmp/qk_files/qk_probs_fp8_as_float_first.pt\n");
+              //       } catch (const std::exception& e2) {
+              //         fprintf(stderr, "[QK-DUMP] fallback save probs(FP8->float) failed: %s\n", e2.what());
+              //       }
+              //     }
+              //   }
+              //   // 若 fd<0，说明之前已保存过，跳过
+              // }
+
               using HostF8 = c10::Float8_e4m3fnuz;
               using DevF8  = __hip_fp8_e4m3_fnuz;
 
@@ -322,9 +419,35 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
               stride_bz_v, stride_h_v, stride_d_v,
               stride_bz_o, stride_seq_o, stride_h_o,
               lda, ldb, ldd);
-              hipEventRecord(ev_sv_e, stream);
+              // hipEventRecord(ev_sv_e, stream);
               output.copy_(o_fp32);
               
+            // {
+            //   static const char* kMarkerPath = "/home/tmp/o_files/o_first.marker";
+            //   static const char* kDumpPath   = "/home/tmp/o_files/o_first.pt";
+
+            //   int fd = ::open(kMarkerPath, O_CREAT | O_EXCL | O_WRONLY, 0644);
+            //   if (fd >= 0) {
+            //     ::write(fd, "saved\n", 6);
+            //     ::close(fd);
+
+            //     hipStreamSynchronize(TORCH_STREAM);  // 确保 o_fp32 已经写完
+
+            //     auto o_cpu = o_fp32.to(at::kCPU).contiguous();
+            //     try {
+            //       torch::save(o_cpu, kDumpPath);
+            //       printf("[O-DUMP] saved first O tensor to %s\n", kDumpPath);
+            //     } catch (const std::exception& e) {
+            //       fprintf(stderr, "[O-DUMP] save failed: %s\n", e.what());
+            //       // 兜底写成二进制
+            //       std::ofstream ofs("/home/SageAttention/o_first.bin", std::ios::binary);
+            //       ofs.write(reinterpret_cast<const char*>(o_cpu.data_ptr<float>()),
+            //                 o_cpu.numel() * sizeof(float));
+            //       ofs.close();
+            //       printf("[O-DUMP] wrote raw .bin fallback to /home/SageAttention/o_first.bin\n");
+            //     }
+            //   }
+            // }
 
             //   float ms_qk=0.f, ms_soft=0.f, ms_sv=0.f;
             //   hipEventElapsedTime(&ms_qk,  ev_qk_s,  ev_qk_e);

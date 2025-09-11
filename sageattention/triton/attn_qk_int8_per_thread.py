@@ -63,31 +63,31 @@ def _attn_fwd_inner(
             k_scales_cols = tl.load(K_scale_base + k_idx)
 
             qk = tl.dot(q, k).to(tl.float32)
-            qk = 1.4426950408889634 / (HEAD_DIM ** 0.5) * qk * (q_scales_rows[:, None] * k_scales_cols[None, :])
+            # qk = 1.4426950408889634 / (HEAD_DIM ** 0.5) * qk * (q_scales_rows[:, None] * k_scales_cols[None, :])
 
-            if mask_block is not None:
-                if mask_block.dtype == tl.int1:
-                    qk = qk + tl.where(mask_block, 0, -1.0e6)
-                else:
-                    qk = qk + mask_block
-            else:
-                qk += tl.where(k_mask, 0, -1.0e6)
+            # if mask_block is not None:
+            #     if mask_block.dtype == tl.int1:
+            #         qk = qk + tl.where(mask_block, 0, -1.0e6)
+            #     else:
+            #         qk = qk + mask_block
+            # else:
+            #     qk += tl.where(k_mask, 0, -1.0e6)
 
-            m_ij = tl.maximum(m_i, tl.max(qk, 1))
-            qk = qk - m_ij[:, None]
-            p = tl.math.exp2(qk)
-            l_ij = tl.sum(p, 1)
-            alpha = tl.math.exp2(m_i - m_ij)
-            l_i = l_i * alpha + l_ij
-            acc = acc * alpha[:, None]
+            # m_ij = tl.maximum(m_i, tl.max(qk, 1))
+            # qk = qk - m_ij[:, None]
+            # p = tl.math.exp2(qk)
+            # l_ij = tl.sum(p, 1)
+            # alpha = tl.math.exp2(m_i - m_ij)
+            # l_i = l_i * alpha + l_ij
+            # acc = acc * alpha[:, None]
 
-            v = tl.load(V_ptrs, mask=offs_n[:, None] < (kv_len - start_n))
-            p = p.to(tl.float16)
-            acc += tl.dot(p, v, out_dtype=tl.float16)
-            m_i = m_ij
+            # v = tl.load(V_ptrs, mask=offs_n[:, None] < (kv_len - start_n))
+            # p = p.to(tl.float16)
+            # acc += tl.dot(p, v, out_dtype=tl.float16)
+            # m_i = m_ij
 
         K_ptrs += BLOCK_N * stride_kn
-        V_ptrs += BLOCK_N * stride_vn
+        # V_ptrs += BLOCK_N * stride_vn
 
     return acc, l_i, m_i
 
@@ -157,7 +157,7 @@ def _attn_fwd(
         K_WARP, K_SLICES
     )
 
-    acc = acc / l_i[:, None]
+    # acc = acc / l_i[:, None]
     tl.store(O_block_ptr, acc.to(Out.type.element_ty), mask=(offs_m[:, None] < qo_len))
 
     if RETURN_LSE:
@@ -200,6 +200,8 @@ def forward(q, k, v, q_scale, k_scale, sm_scale, tensor_layout="HND", attn_mask=
     else:
         raise ValueError(f"tensor_layout {tensor_layout} not supported")
 
+    print(f"q.shape:{q.shape}")
+    print(f"k.shape:{k.shape}")
     if attn_mask is not None:
         stride_bz_mask, stride_h_mask, stride_m_mask, stride_n_mask = attn_mask.stride(0), attn_mask.stride(1), attn_mask.stride(2), attn_mask.stride(3)
     else:
