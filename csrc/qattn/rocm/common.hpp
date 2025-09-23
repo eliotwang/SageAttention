@@ -73,6 +73,8 @@ namespace gfx9Params
     {
         ROCWMMA_M = 32u,
         ROCWMMA_N = 32u,
+        ROCWMMA_S = 16u,
+        ROCWMMA_V = 16u,
         ROCWMMA_K = 32u,
         BLOCKS_X  = 2u,
         BLOCKS_Y  = 2u,
@@ -88,6 +90,8 @@ namespace gfx11Params
     {
         ROCWMMA_M = 16u,
         ROCWMMA_N = 16u,
+        ROCWMMA_S = 16u,
+        ROCWMMA_V = 16u,
         ROCWMMA_K = 16u,
         BLOCKS_X  = 4u,
         BLOCKS_Y  = 2u,
@@ -107,6 +111,8 @@ using namespace gfx11Params;
 // Warp tile: computed by each warp
 constexpr uint32_t WARP_TILE_X = BLOCKS_X * ROCWMMA_M;
 constexpr uint32_t WARP_TILE_Y = BLOCKS_Y * ROCWMMA_N;
+constexpr uint32_t WARP_TILE_S = BLOCKS_X * ROCWMMA_S;
+constexpr uint32_t WARP_TILE_V = BLOCKS_Y * ROCWMMA_V;
 
 // Macro Tile: computed by each thread block (workgroup)
 // Note: TBLOCK_X must be multiple of WARP_SIZE.
@@ -114,7 +120,8 @@ constexpr uint32_t WARPS_X      = TBLOCK_X / WARP_SIZE;
 constexpr uint32_t WARPS_Y      = TBLOCK_Y;
 constexpr uint32_t MACRO_TILE_X = WARPS_X * WARP_TILE_X;
 constexpr uint32_t MACRO_TILE_Y = WARPS_Y * WARP_TILE_Y;
-
+constexpr uint32_t MACRO_TILE_S = WARPS_X * WARP_TILE_S;
+constexpr uint32_t MACRO_TILE_V = WARPS_Y * WARP_TILE_V;
 
 // HIP Host functions to determine the gfx architecture
 // bool isGfx9()

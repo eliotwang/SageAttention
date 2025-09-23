@@ -316,39 +316,39 @@ def sageattn_qk_int8_pv_fp16_triton(
         # o, lse = attn_false(q_int8, k_int8, v, q_scale, k_scale, tensor_layout=tensor_layout, output_dtype=dtype, attn_mask=attn_mask, return_lse=return_lse)
         o, lse = attn_thread_false(q_int8, k_int8, v, q_scale, k_scale, sm_scale=sm_scale, tensor_layout=tensor_layout, output_dtype=dtype, attn_mask=attn_mask, return_lse=return_lse)
         # o = attn_qk_false(q_int8, k_int8, q_scale, k_scale, sm_scale=sm_scale, tensor_layout=tensor_layout,attn_mask=attn_mask)
-    # import os, sys
-    # import torch.distributed as dist
+    import os, sys
+    import torch.distributed as dist
 
-    # SAVE_PATH = "/home/tmp/triton/qk.pt"     # 放到你的挂载卷
-    # MARKER    = SAVE_PATH + ".first"       # “谁先创建谁保存”的标记文件
+    SAVE_PATH = "/home/tmp/triton/o.pt"     # 放到你的挂载卷
+    MARKER    = SAVE_PATH + ".first"       # “谁先创建谁保存”的标记文件
 
-    # def _is_rank0():
-    #     return not (dist.is_available() and dist.is_initialized()) or dist.get_rank() == 0
+    def _is_rank0():
+        return not (dist.is_available() and dist.is_initialized()) or dist.get_rank() == 0
 
-    # def _save_quant_once(o, save_path=SAVE_PATH, marker=MARKER):
-    #     # 1) 只有 rank0 尝试保存（多卡时避免每张卡都抢）
-    #     if not _is_rank0():
-    #         return
-    #     # 2) 尝试原子创建标记文件，谁成功谁保存；其余进程直接返回
-    #     try:
-    #         fd = os.open(marker, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-    #     except FileExistsError:
-    #         return  # 已有其它进程抢到“第一次”
-    #     else:
-    #         # 写点内容方便排查
-    #         with os.fdopen(fd, "w") as f:
-    #             f.write("saved\n")
+    def _save_quant_once(o, save_path=SAVE_PATH, marker=MARKER):
+        # 1) 只有 rank0 尝试保存（多卡时避免每张卡都抢）
+        if not _is_rank0():
+            return
+        # 2) 尝试原子创建标记文件，谁成功谁保存；其余进程直接返回
+        try:
+            fd = os.open(marker, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        except FileExistsError:
+            return  # 已有其它进程抢到“第一次”
+        else:
+            # 写点内容方便排查
+            with os.fdopen(fd, "w") as f:
+                f.write("saved\n")
 
-    #     # 3) 真正保存：先写临时文件，再原子替换，避免半写入
-    #     tmp = save_path + ".tmp"
-    #     torch.save(
-    #         {"o": o.detach().cpu()},
-    #         tmp
-    #     )
-    #     os.replace(tmp, save_path)  # POSIX 原子替换
-    #     print(f"[INFO] Quantized V saved to: {save_path}")
-    #     sys.stdout.flush()
-    # _save_quant_once(o)
+        # 3) 真正保存：先写临时文件，再原子替换，避免半写入
+        tmp = save_path + ".tmp"
+        torch.save(
+            {"o": o.detach().cpu()},
+            tmp
+        )
+        os.replace(tmp, save_path)  # POSIX 原子替换
+        print(f"[INFO] Quantized V saved to: {save_path}")
+        sys.stdout.flush()
+    _save_quant_once(o)
 
     # o = torch.randn(q.shape, dtype=torch.float16, device=q.device)
     o = o[..., :head_dim_og]
@@ -741,6 +741,7 @@ def sageattn_qk_int8_pv_fp8_cuda(
     """
 
     dtype = q.dtype
+    # print(dtype)
     # assert SM89_ENABLED, "SM89 kernel is not available. Make sure you GPUs with compute capability 8.9."
     assert q.is_cuda, "Input tensors must be on cuda."
     assert dtype in [torch.float16, torch.bfloat16], "Input tensors must be in dtype of torch.float16 or torch.bfloat16"
@@ -762,6 +763,7 @@ def sageattn_qk_int8_pv_fp8_cuda(
     torch.cuda.set_device(v.device)
 
     _tensor_layout = 0 if tensor_layout == "NHD" else 1
+    # print(tensor_layout)
     _is_caual = 1 if is_causal else 0
     _qk_quant_gran = 3 if qk_quant_gran == "per_thread" else 2
     _return_lse = 1 if return_lse else 0
@@ -816,16 +818,29 @@ def sageattn_qk_int8_pv_fp8_cuda(
     if pv_accum_dtype == 'fp32+fp16':
         quant_v_scale_max = 2.25
 
+    kv_len = k.size(seq_dim)
+    v_pad_len = 128 - (kv_len % 128) if kv_len % 128 != 0 else 0
+    if v_pad_len > 0:
+        if tensor_layout == "HND":
+            v = torch.cat([v, torch.zeros(v.size(0), v.size(1), v_pad_len, v.size(3), dtype=v.dtype, device=v.device)], dim=2)
+        else:
+            v = torch.cat([v, torch.zeros(v.size(0), v_pad_len, v.size(2), v.size(3), dtype=v.dtype, device=v.device)], dim=1)
+
     v_fp8, v_scale, vm = per_channel_fp8(v, tensor_layout=tensor_layout, scale_max=quant_v_scale_max, smooth_v=smooth_v)
+    
     # print(f"-----------------------------{smooth_v}-----------------------------")
     # print(f"-----------------------------------------------------{tensor_layout}-------------------------------")
+    # print("q_int8.shape:",q_int8.shape)
+    # print("k_int8.shape:",k_int8.shape)
     # print("v.shape:",v.shape)
     # print("v_fp8 shape:", v_fp8.shape)    # FP8 量化后的张量
     # print("v_scale shape:", v_scale.shape)
+    # print(smooth_v)
+    # print(pv_accum_dtype)
     import os, sys
     import torch.distributed as dist
 
-    SAVE_PATH = "/home/tmp/v_files/vfp8_scale.pt"     # 放到你的挂载卷
+    SAVE_PATH = "/home/tmp/v_files/v.pt"     # 放到你的挂载卷
     MARKER    = SAVE_PATH + ".first"       # “谁先创建谁保存”的标记文件
 
     def _is_rank0():
@@ -855,7 +870,7 @@ def sageattn_qk_int8_pv_fp8_cuda(
         print(f"[INFO] Quantized V saved to: {save_path}")
         sys.stdout.flush()
 
-    # _save_quant_once(v_scale)
+    _save_quant_once(v)
     # if pv_accum_dtype == "fp32":
     #     if smooth_v:
     #         lse = _qattn_sm89.qk_int8_sv_f8_accum_f32_fuse_v_scale_fuse_v_mean_attn(q_int8, k_int8, v_fp8, o, q_scale, k_scale, v_scale, vm, _tensor_layout, _is_caual, _qk_quant_gran, sm_scale, _return_lse)
@@ -867,9 +882,12 @@ def sageattn_qk_int8_pv_fp8_cuda(
     #     lse = _qattn_sm89.qk_int8_sv_f8_accum_f16_fuse_v_scale_attn_inst_buf(q_int8, k_int8, v_fp8, o, q_scale, k_scale, v_scale, _tensor_layout, _is_caual, _qk_quant_gran, sm_scale, _return_lse)
     # print("is causal:",_is_caual)
     lse = _qattn_rocm.qk_int8_sv_f8_accum_f32_attn(q_int8, k_int8, v_fp8, o, q_scale, k_scale, v_scale, _tensor_layout, _is_caual, _qk_quant_gran, sm_scale, _return_lse)
+    # v = v.contiguous()
+    # lse = _qattn_rocm.qk_int8_sv_f8_accum_f32_attn(q_int8, k_int8, v, o, q_scale, k_scale, _tensor_layout, _is_caual, _qk_quant_gran, sm_scale, _return_lse)
+    
     o = o[..., :head_dim_og]
 
-    # _save_quant_once(o)
+    # _save_quant_once(v)
 
     if return_lse:
         return o, lse / 1.44269504 + lse_correction * sm_scale if smooth_k else lse / 1.44269504

@@ -52,7 +52,6 @@ def load_tensor_any(path, map_location="cpu", prefer_dtype=None, prefer_ndim=Non
     except RuntimeError as e:
         # 典型：TorchScript archive 会在这里抛错
         if "TorchScript" not in str(e) and "archive" not in str(e):
-            # 不是 TorchScript 的典型错误，继续往下兜底
             pass
 
     # 2) TorchScript 存档路径
@@ -105,38 +104,28 @@ def load_tensor_any(path, map_location="cpu", prefer_dtype=None, prefer_ndim=Non
             return t, f"weights_only=False->dict({k})"
     raise RuntimeError(f"读取到非 Tensor 对象: {type(obj)}，且无法自动提取。")
 
-def save_head_csv(tensor: torch.Tensor, n: int, csv_path: str):
-    flat = tensor.flatten().to("cpu")[:n]
-    pd.DataFrame(flat.numpy(), columns=["values"]).to_csv(csv_path, index=False)
-    print(f"[OK] 已写出前 {len(flat)} 个元素到 {csv_path}")
-
-def save_head_csv_with_fp8(tensor: torch.Tensor, n: int, csv_path: str):
+def save_tail_csv(tensor: torch.Tensor, n: int, csv_path: str, keep_order: bool = False):
     """
-    同时导出 FP8 的原始编码 (uint8) 和解码值 (float32)
+    从“末尾开始”取 n 个元素：
+    - 默认输出顺序为从最后一个往前（满足“从后往前读”的直觉）
+    - 若 keep_order=True，则保持自然顺序（更早的在前，最后的在后）
     """
-    flat = tensor.flatten().cpu()[:n]
-
-    # 原始编码值 (0~255)
-    fp8_code = flat.view(torch.uint8)
-
-    # 解码后的值 (FP8 -> FP32)
-    fp8_value = flat.to(torch.float32)
-
-    import pandas as pd
-    df = pd.DataFrame({
-        "fp8_code": fp8_code.numpy(),
-        "fp8_value": fp8_value.numpy()
-    })
-
-    df.to_csv(csv_path, index=False)
-    print(f"[OK] 已写出前 {len(flat)} 个元素到 {csv_path}，包含 fp8_code 和 fp8_value 两列")
+    flat = tensor.flatten().to("cpu")
+    n = max(0, min(int(n), flat.numel()))
+    tail = flat[-n:] if n > 0 else flat[:0]
+    if not keep_order:
+        tail = torch.flip(tail, dims=[0])  # 从后往前写
+    pd.DataFrame(tail.numpy(), columns=["values"]).to_csv(csv_path, index=False)
+    direction = "从后往前" if not keep_order else "保持自然顺序"
+    print(f"[OK] 已{direction}写出 {len(tail)} 个元素到 {csv_path}")
 
 def main():
-    ap = argparse.ArgumentParser(description="Load tensor (Tensor/TorchScript) and dump first N elems to CSV")
-    ap.add_argument("--pt",   default="/home/tmp/qkroc/o_first.pt", help="要读取的 .pt 路径")
-    ap.add_argument("--csv",  default="/home/tmp/qkroc/o.csv", help="要写出的 CSV 文件")
-    ap.add_argument("-n", "--num", type=int, default=10000, help="写出的前 N 个元素")
-    # logits 偏好：float32 + 4D；若是 probs 同理
+    ap = argparse.ArgumentParser(description="Load tensor (Tensor/TorchScript) and dump LAST N elems to CSV")
+    ap.add_argument("--pt",   default="/home/tmp/o_files/o_first.pt",  help="要读取的 .pt 路径")
+    ap.add_argument("--csv",  default="/home/tmp/o_files/o_last.csv",  help="要写出的 CSV 文件")
+    ap.add_argument("-n", "--num", type=int, default=10000, help="从末尾取的 N 个元素")
+    ap.add_argument("--keep-order", action="store_true", help="保持自然顺序（不反转）")
+    # 偏好：例如 logits 常见 float32 + 4D
     ap.add_argument("--prefer", choices=["int32","float32","none"], default="float32")
     args = ap.parse_args()
 
@@ -144,8 +133,7 @@ def main():
 
     t, how = load_tensor_any(args.pt, map_location="cpu", prefer_dtype=prefer_dtype, prefer_ndim=4)
     print(f"[INFO] 加载成功 via {how}: shape={tuple(t.shape)}, dtype={t.dtype}")
-    save_head_csv(t, args.num, args.csv)
-    # save_head_csv_with_fp8(t, args.num, args.csv)
+    save_tail_csv(t, args.num, args.csv, keep_order=args.keep_order)
 
 if __name__ == "__main__":
     main()

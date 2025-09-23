@@ -234,8 +234,8 @@ using OutputTQK  = int32_t;
 using ComputeTQK = int32_t;
 
 
-using DataLayoutQ   = col_major;
-using DataLayoutK   = row_major;
+using DataLayoutQ   = row_major;
+using DataLayoutK   = col_major;
 using DataLayoutQK   = row_major;
 using DataLayoutQKLds = col_major;
 
@@ -464,10 +464,8 @@ ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_
         const uint32_t head_id = blockIdx.y;
 
         const uint32_t num_iterations = div_ceil(
-            mask_mode == MaskMode::kCausal
-                ? min(kv_len, (bx + 1) * CTA_Q)
-                : kv_len,
-            CTA_K);
+            kv_len,
+            MACRO_TILE_Y);
 
         auto outptr = T + batch_id * stride_bz_t + head_id * stride_h_t;
         // T += batch_id * stride_bz_t + head_id * stride_h_t;
@@ -480,7 +478,7 @@ ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_
             auto warpTileBound = warpTileCoord + warpTileSize;
             if(get<0>(warpTileBound) > qo_len || get<1>(warpTileBound) > kv_len)
             {
-                return;
+                continue;
             }
             ///
             /// 1D global read coordinate setup
@@ -488,11 +486,15 @@ ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_
             using GRBuffQMap1d = GetDataLayout_t<GRBuffQ>;
             using GRBuffKMap1d = GetDataLayout_t<GRBuffK>;
 
+            const uint32_t m0 = get<0>(macroTileCoord);
+            const uint32_t n0 = get<1>(macroTileCoord);
             // Initial globa read address offsets
             auto globalReadOffsetA
-                = batch_id * stride_bz_q + head_id * stride_h_q + bx * MACRO_TILE_X;
+                = batch_id * stride_bz_q + head_id * stride_h_q +
+                GRBuffQMap1d::fromMatrixCoord(make_coord2d(m0, 0u), lda);
             auto globalReadOffsetB
-                = batch_id * stride_bz_k + (head_id / num_kv_groups) * stride_h_k + iter * MACRO_TILE_Y;
+                = batch_id * stride_bz_k + (head_id / num_kv_groups) * stride_h_k + 
+                GRBuffKMap1d::fromMatrixCoord(make_coord2d(0u, n0), ldb);
 
             // Incremental global read address offsets
             auto kStepOffsetA = GRBuffQMap1d::fromMatrixCoord(make_coord2d(0u, ROCWMMA_K), lda);
@@ -650,7 +652,7 @@ ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_
             ///
             // MfmaFragD fragsD[BLOCKS_X][BLOCKS_Y];
             // uniformFma(fragsD, alpha, fragsAcc, beta, fragsC);
-            globalWriteD(outptr + MfmaFragDMap1d::fromMatrixCoord(warpTileCoord, ldd), fragsAcc, ldd);
+            globalWriteD(outptr + get<0>(warpTileCoord) * stride_seq_t + get<1>(warpTileCoord), fragsAcc, ldd);
             // outptr += CTA_K;//
         }
     }

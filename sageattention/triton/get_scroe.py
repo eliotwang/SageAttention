@@ -126,12 +126,12 @@ def qk_forward(q, k, q_scale, k_scale, sm_scale,
     BLOCK_M, BLOCK_N = 128, 64
     Q_WARP, Q_SLICES = 32, 8
     K_WARP, K_SLICES = 64, 4
-    out_dtype=torch.float16
+    out_dtype=torch.float32
     if tensor_layout == "HND":
         b, h_q, M, D = q.shape
         _, h_kv, N, _ = k.shape
         assert h_q % h_kv == 0
-        Scores = torch.empty((b, h_q, M, N), dtype=out_dtype, device=q.device)
+        Scores = torch.empty((b, h_q, M, N), dtype=torch.int32, device=q.device)
 
         sqz, sqh, sqn = q.stride(0), q.stride(1), q.stride(2)
         skz, skh, skn = k.stride(0), k.stride(1), k.stride(2)
@@ -171,4 +171,16 @@ def qk_forward(q, k, q_scale, k_scale, sm_scale,
         num_warps=4 if D == 64 else 8,
         num_stages=3 if D == 64 else 4,
     )
+
+    # ln2 = math.log(2.0)
+    # m = Scores.amax(dim=-1, keepdim=True)
+    # z = Scores - m
+    # z = torch.where(torch.isfinite(z), z, torch.full_like(z, float('-inf')))
+
+    # # base-2 softmax: exp(z * ln2)
+    # w = torch.exp(z * ln2)
+    # denom = w.sum(dim=-1, keepdim=True).clamp_min(1e-20)
+    # probs = (w / denom).nan_to_num(0.0, 0.0, 0.0)
+
     return Scores
+    # return probs
