@@ -2,9 +2,9 @@ import os, time, csv
 import torch
 
 # ========= 配置 =========
-file1 = "/home/tmp/rightqk/qk_int32_first.pt"  # a
-file2 = "/home/tmp/triton/qk.pt"               # b
-HEAD_INDEX = 1                                  # 要比较的 head
+file1 = "/home/tmp/newv/vafter_first.pt"  # a
+file2 = "/home/tmp/newv/vbefore.pt"               # b
+HEAD_INDEX = 0                                  # 要比较的 head
 SAVE_CSV = True
 CSV_PATH = f"row_cosine_head{HEAD_INDEX}.csv"
 PRINT_WORST_K = 10                               # 打印余弦最差的前 K 行（按 cos 从小到大）

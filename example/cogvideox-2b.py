@@ -52,4 +52,4 @@ with torch.no_grad():
     end = time.time()     
     print(f"[INFO] Inference took {end - start:.2f} seconds")
 
-export_to_video(video, f"f_thread_{args.attention_type}.mp4", fps=8)
+export_to_video(video, f"cogvideox-2b_{args.attention_type}.mp4", fps=8)

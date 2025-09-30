@@ -71,6 +71,7 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
                     torch::Tensor query_scale,
                     torch::Tensor key_scale,
                     torch::Tensor value_scale,
+                    // torch::Tensor value_mean,
                     int tensor_layout,
                     int is_causal,
                     int qk_quant_gran,
@@ -468,79 +469,94 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
               
 
               HIP_CHECK(hipStreamSynchronize(TORCH_STREAM));
-              // int k = std::max(0, (int)std::ceil(std::log2((double)N_pad) - 8.0));
-              // float c = (float)(1u << k);
-              // probs.mul_(c);
+              int k = std::max(0, (int)std::ceil(std::log2((double)N_pad) - 8.0));
+              float c = (float)(1u << k);
+              probs.mul_(c);
               at::Tensor s = probs.to(at::kFloat8_e4m3fnuz).contiguous();
-              
-              // // value = value.permute({0,1,3,2}).contiguous();
-              // auto O_valid = at::matmul(s, value);
+
+              // auto vf32 = value.to(at::kFloat).contiguous();
+              // vf32 = vf32 * value_scale.to(at::kFloat).unsqueeze(-1);
+              // // vf32 = vf32 + value_mean.to(at::kFloat).unsqueeze(-1);
+              // auto v = vf32.permute({0,1,3,2}).contiguous();
+
+              // // TORCH_CHECK(v.size(2) % 16 == 0, "n_pad 必须是16的倍数");
+              // // auto idx = torch::tensor({0,1,8,9,2,3,10,11,4,5,12,13,6,7,14,15},
+              // //            torch::dtype(torch::kLong).device(v.device()));
+
+              // // auto b = v.size(0), h = v.size(1), N_pad = v.size(2), d = v.size(3);
+              // // auto v4 = v.view({b*h, N_pad/16, 16, d});
+              // // v4 = v4.index_select(2, idx);
+              // // v = v4.view({b,h,N_pad,d}).contiguous();
+
+              // v = v.narrow(2,0,N);
+              // v = v.to(at::kHalf).contiguous();
+
+              // auto O_valid = at::matmul(s, v);
               // // O_valid.div_(c);
               // output.copy_(O_valid);
 
-              // // ====== 量化后（s: Float8_e4m3fnuz）======
-              // auto s_cpu   = s.to(torch::kFloat32).to(torch::kCPU).contiguous();
-              // auto nz8_cnt = at::count_nonzero(s_cpu).item<int64_t>();
-              // double nz8_frac = static_cast<double>(nz8_cnt) / static_cast<double>(s_cpu.numel());
+            //   // // ====== 量化后（s: Float8_e4m3fnuz）======
+            //   // auto s_cpu   = s.to(torch::kFloat32).to(torch::kCPU).contiguous();
+            //   // auto nz8_cnt = at::count_nonzero(s_cpu).item<int64_t>();
+            //   // double nz8_frac = static_cast<double>(nz8_cnt) / static_cast<double>(s_cpu.numel());
 
-              // auto pos_mask8 = s_cpu > 0;
-              // double min_pos8 = 0.0;
-              // if (pos_mask8.any().item<bool>()) {
-              //   min_pos8 = s_cpu.masked_select(pos_mask8).min().item<float>();
-              // }
+            //   // auto pos_mask8 = s_cpu > 0;
+            //   // double min_pos8 = 0.0;
+            //   // if (pos_mask8.any().item<bool>()) {
+            //   //   min_pos8 = s_cpu.masked_select(pos_mask8).min().item<float>();
+            //   // }
 
-              // std::cout << "[s(fp8->f32)] nonzero frac: " << nz8_frac
-              //           << ", nonzero count: " << nz8_cnt
-              //           << ", min>0: " << min_pos8 << std::endl;
+            //   // std::cout << "[s(fp8->f32)] nonzero frac: " << nz8_frac
+            //   //           << ", nonzero count: " << nz8_cnt
+            //   //           << ", min>0: " << min_pos8 << std::endl;
 
-              // {
-              //   static const char* kMarkerPath = "/home/tmp/rightqk/s_first.marker";
-              //   int fd = ::open(kMarkerPath, O_CREAT | O_EXCL | O_WRONLY, 0644);
-              //   if (fd >= 0) {
-              //     ::write(fd, "saved\n", 6);
-              //     ::close(fd);
+            //   // {
+            //   //   static const char* kMarkerPath = "/home/tmp/rightqk/s_first.marker";
+            //   //   int fd = ::open(kMarkerPath, O_CREAT | O_EXCL | O_WRONLY, 0644);
+            //   //   if (fd >= 0) {
+            //   //     ::write(fd, "saved\n", 6);
+            //   //     ::close(fd);
 
-              //     hipStreamSynchronize(TORCH_STREAM);  // 确保 logits/probs/s 已就绪
+            //   //     hipStreamSynchronize(TORCH_STREAM);  // 确保 logits/probs/s 已就绪
 
-              //     // 1) 反量化+1/sqrt(d) 之后的 logits（float32）
-              //     try {
-              //       auto logits_cpu = logits.to(at::kCPU).contiguous();  // [B,H,qo_len,kv_len], float
-              //       torch::save(logits_cpu, "/home/tmp/rightqk/qk_logits_deq_first.pt");
-              //       printf("[QK-DUMP] saved dequantized logits to /home/tmp/qk_files/qk_logits_deq_first.pt\n");
-              //     } catch (const std::exception& e) {
-              //       fprintf(stderr, "[QK-DUMP] save logits failed: %s\n", e.what());
-              //     }
+            //   //     // 1) 反量化+1/sqrt(d) 之后的 logits（float32）
+            //   //     try {
+            //   //       auto logits_cpu = logits.to(at::kCPU).contiguous();  // [B,H,qo_len,kv_len], float
+            //   //       torch::save(logits_cpu, "/home/tmp/rightqk/qk_logits_deq_first.pt");
+            //   //       printf("[QK-DUMP] saved dequantized logits to /home/tmp/qk_files/qk_logits_deq_first.pt\n");
+            //   //     } catch (const std::exception& e) {
+            //   //       fprintf(stderr, "[QK-DUMP] save logits failed: %s\n", e.what());
+            //   //     }
 
-              //     // 2) softmax 后的概率（float32）
-              //     try {
-              //       auto probs_cpu = p.to(at::kCPU).contiguous();    // [B,H,qo_len,kv_len], float
-              //       torch::save(probs_cpu, "/home/tmp/rightqk/qk_probs_first.pt");
-              //       printf("[QK-DUMP] saved softmax probs to /home/tmp/qk_files/qk_probs_first.pt\n");
-              //     } catch (const std::exception& e) {
-              //       fprintf(stderr, "[QK-DUMP] save probs failed: %s\n", e.what());
-              //     }
+            //   //     // 2) softmax 后的概率（float32）
+            //   //     try {
+            //   //       auto probs_cpu = p.to(at::kCPU).contiguous();    // [B,H,qo_len,kv_len], float
+            //   //       torch::save(probs_cpu, "/home/tmp/rightqk/qk_probs_first.pt");
+            //   //       printf("[QK-DUMP] saved softmax probs to /home/tmp/qk_files/qk_probs_first.pt\n");
+            //   //     } catch (const std::exception& e) {
+            //   //       fprintf(stderr, "[QK-DUMP] save probs failed: %s\n", e.what());
+            //   //     }
 
-              //     // 3) 概率的 FP8 量化版本（可选，方便核对你的 SV 路径输入）
-              //     try {
-              //       auto s_cpu = s.to(at::kCPU).contiguous();            // [B,H,qo_len,kv_len], float8_e4m3fnuz
-              //       torch::save(s_cpu, "/home/tmp/rightqk/qk_probs_fp8_first.pt");
-              //       printf("[QK-DUMP] saved probs(FP8) to /home/tmp/qk_files/qk_probs_fp8_first.pt\n");
-              //     } catch (const std::exception& e) {
-              //       fprintf(stderr, "[QK-DUMP] save probs(FP8) failed: %s\n", e.what());
-              //       // 兜底：转回 float 再存
-              //       try {
-              //         auto s_as_f32_cpu = s.to(at::kFloat).to(at::kCPU).contiguous();
-              //         torch::save(s_as_f32_cpu, "/home/tmp/qk_files/qk_probs_fp8_as_float_first.pt");
-              //         printf("[QK-DUMP] saved probs(FP8->float) to /home/tmp/qk_files/qk_probs_fp8_as_float_first.pt\n");
-              //       } catch (const std::exception& e2) {
-              //         fprintf(stderr, "[QK-DUMP] fallback save probs(FP8->float) failed: %s\n", e2.what());
-              //       }
-              //     }
-              //   }
-              //   // 若 fd<0，说明之前已保存过，跳过
-              // }
-              // std::cout<<"s.shape:"<<s.size(0)<<" "<<s.size(1)<<" "<<s.size(2)<<" "<<s.size(3)<<std::endl;
-              // std::cout<<"value.shape:"<<value.size(0)<<" "<<value.size(1)<<" "<<value.size(2)<<" "<<value.size(3)<<std::endl;
+            //   //     // 3) 概率的 FP8 量化版本（可选，方便核对你的 SV 路径输入）
+            //   //     try {
+            //   //       auto s_cpu = s.to(at::kCPU).contiguous();            // [B,H,qo_len,kv_len], float8_e4m3fnuz
+            //   //       torch::save(s_cpu, "/home/tmp/rightqk/qk_probs_fp8_first.pt");
+            //   //       printf("[QK-DUMP] saved probs(FP8) to /home/tmp/qk_files/qk_probs_fp8_first.pt\n");
+            //   //     } catch (const std::exception& e) {
+            //   //       fprintf(stderr, "[QK-DUMP] save probs(FP8) failed: %s\n", e.what());
+            //   //       // 兜底：转回 float 再存
+            //   //       try {
+            //   //         auto s_as_f32_cpu = s.to(at::kFloat).to(at::kCPU).contiguous();
+            //   //         torch::save(s_as_f32_cpu, "/home/tmp/qk_files/qk_probs_fp8_as_float_first.pt");
+            //   //         printf("[QK-DUMP] saved probs(FP8->float) to /home/tmp/qk_files/qk_probs_fp8_as_float_first.pt\n");
+            //   //       } catch (const std::exception& e2) {
+            //   //         fprintf(stderr, "[QK-DUMP] fallback save probs(FP8->float) failed: %s\n", e2.what());
+            //   //       }
+            //   //     }
+            //   //   }
+            //   //   // 若 fd<0，说明之前已保存过，跳过
+            //   // }
+            
               auto S_pad = at::constant_pad_nd(
                 s.contiguous(),                           
                 {0, (int64_t)(N_pad - N), 0, (int64_t)(M_pad - M)},  // {N_right,N_left, M_right,M_left}
@@ -553,7 +569,7 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
                 0
               );
 
-              // V_pad = V_pad.permute({0,1,3,2}).contiguous();
+            // //   // V_pad = V_pad.permute({0,1,3,2}).contiguous();
               auto O_pad = at::zeros({B, Hq, M_pad, D}, output.options().dtype(torch::kFloat)).contiguous();
               
               const uint32_t stride_bz_s = (uint32_t)S_pad.stride(0);  // = Hq * M_pad * N_pad
@@ -569,7 +585,7 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
               const uint32_t stride_seq_o= (uint32_t)O_pad.stride(2);
 
               const uint32_t lda = (uint32_t)N_pad;
-              const uint32_t ldb = (uint32_t)D;
+              const uint32_t ldb = (uint32_t)N_pad;
               const uint32_t ldd = (uint32_t)D;
 
               using HostF8 = c10::Float8_e4m3fnuz;
@@ -589,8 +605,8 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
             //   hipEventRecord(ev_sv_s, stream);
               dim3 gridsv(div_ceil(M_pad, 64), num_qo_heads, batch_size);
              hipLaunchKernelGGL(( kernel_func_sv), dim3(gridsv), dim3(block), smem_max, 0, 
-              reinterpret_cast<DevF8*>(S_pad.data_ptr<HostF8>()),
-              reinterpret_cast<DevF8*>(V_pad.data_ptr<HostF8>()),
+              reinterpret_cast<DevF8*>(S_pad.data_ptr()),
+              reinterpret_cast<DevF8*>(V_pad.data_ptr()),
               O_pad.data_ptr<float>(),   
               nullptr,
               nullptr,
@@ -601,7 +617,7 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
               stride_bz_v, stride_seq_v, stride_h_v,
               stride_bz_o, stride_seq_o, stride_h_o,
               lda, ldb, ldd);
-              // hipEventRecord(ev_sv_e, stream);
+            //   // hipEventRecord(ev_sv_e, stream);
               
               HIP_CHECK(hipGetLastError());
               HIP_CHECK(hipStreamSynchronize(stream));
@@ -616,54 +632,37 @@ torch::Tensor qk_int8_sv_f8_accum_f32_attn(torch::Tensor query,
                                   .expand({B, Hkv, (int64_t)num_kv_groups, D})    // (B, Hkv, G, D)
                                   .reshape({B, Hq, D});                           // (B, Hq, D)
 
-              // O_pad.div_(c);                            // 补偿全局放大
+              O_pad.div_(c);                            // 补偿全局放大
               auto O_valid = O_pad.narrow(/*dim=*/2, 0, M);    // [B,H,M,D]
               O_valid.mul_(value_scale_hq.unsqueeze(2));       // 右乘列缩放（per-D） 
               output.copy_(O_valid);
               
-              // auto P_ref = probs;
-              // auto V_ref = value.to(at::kFloat);
-              // V_ref.mul_(value_scale.unsqueeze(-1));
+            // {
+            //   static const char* kMarkerPath = "/home/tmp/lastv/o_first.marker";
+            //   static const char* kDumpPath   = "/home/tmp/lastv/o.pt";
 
-              // V_ref = V_ref.permute({0,1,3,2}).contiguous();
-              // // TORCH_CHECK(P_ref.size(-1) == V_ref.size(-2));
-              // std::cout << "p_ref.size(-1):"<<P_ref.size(-1)<<"v_ref.size(-2):"<<
-              // V_ref.size(-2)<<std::endl;
-              // auto O_ref = at::matmul(P_ref, V_ref);
+            //   int fd = ::open(kMarkerPath, O_CREAT | O_EXCL | O_WRONLY, 0644);
+            //   if (fd >= 0) {
+            //     ::write(fd, "saved\n", 6);
+            //     ::close(fd);
 
-              // auto O_ref_head = O_ref[0][0].contiguous().view(-1);
-              // auto O_ker_head = O_pad[0][0].contiguous().view(-1);
-              // std::cout << "[cmp] ref max=" << O_ref_head.abs().max().item<float>()
-              //           << " ker max=" << O_ker_head.abs().max().item<float>() << "\n";
-              // double l2 = (O_ref_head - O_ker_head).norm().item<double>() /
-              //             (O_ref_head.norm().item<double>() + 1e-6);
-              // std::cout << "[cmp] relative L2=" << l2 << "\n";
-            {
-              static const char* kMarkerPath = "/home/tmp/qkroc/o_first.marker";
-              static const char* kDumpPath   = "/home/tmp/qkroc/o_first.pt";
+            //     hipStreamSynchronize(TORCH_STREAM);  // 确保 o_fp32 已经写完
 
-              int fd = ::open(kMarkerPath, O_CREAT | O_EXCL | O_WRONLY, 0644);
-              if (fd >= 0) {
-                ::write(fd, "saved\n", 6);
-                ::close(fd);
-
-                hipStreamSynchronize(TORCH_STREAM);  // 确保 o_fp32 已经写完
-
-                auto o_cpu = O_valid.to(at::kCPU).contiguous();
-                try {
-                  torch::save(o_cpu, kDumpPath);
-                  printf("[O-DUMP] saved first O tensor to %s\n", kDumpPath);
-                } catch (const std::exception& e) {
-                  fprintf(stderr, "[O-DUMP] save failed: %s\n", e.what());
-                  // 兜底写成二进制
-                  std::ofstream ofs("/home/SageAttention/o_first.bin", std::ios::binary);
-                  ofs.write(reinterpret_cast<const char*>(o_cpu.data_ptr<float>()),
-                            o_cpu.numel() * sizeof(float));
-                  ofs.close();
-                  printf("[O-DUMP] wrote raw .bin fallback to /home/SageAttention/o_first.bin\n");
-                }
-              }
-            }
+            //     auto o_cpu = O_valid.to(at::kCPU).contiguous();
+            //     try {
+            //       torch::save(o_cpu, kDumpPath);
+            //       printf("[O-DUMP] saved first O tensor to %s\n", kDumpPath);
+            //     } catch (const std::exception& e) {
+            //       fprintf(stderr, "[O-DUMP] save failed: %s\n", e.what());
+            //       // 兜底写成二进制
+            //       std::ofstream ofs("/home/SageAttention/o_first.bin", std::ios::binary);
+            //       ofs.write(reinterpret_cast<const char*>(o_cpu.data_ptr<float>()),
+            //                 o_cpu.numel() * sizeof(float));
+            //       ofs.close();
+            //       printf("[O-DUMP] wrote raw .bin fallback to /home/SageAttention/o_first.bin\n");
+            //     }
+            //   }
+            // }
 
             //   float ms_qk=0.f, ms_soft=0.f, ms_sv=0.f;
             //   hipEventElapsedTime(&ms_qk,  ev_qk_s,  ev_qk_e);

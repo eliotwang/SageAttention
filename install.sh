@@ -5,3 +5,4 @@ rm -rf build/
 clear
 
 python setup.py install
+

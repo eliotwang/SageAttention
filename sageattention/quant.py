@@ -16,6 +16,7 @@ limitations under the License.
 
 import torch
 from typing import Any, List, Literal, Optional, Tuple, Union
+from typing import Optional, Tuple
 
 from . import _fused
 
@@ -319,7 +320,121 @@ def per_channel_fp8(
     else:
         _fused.scale_fuse_quant_cuda(v_transposed_permutted, v_fp8, v_scale, kv_len, scale_max, _tensor_layout)
         return v_fp8, v_scale, None
+    
+def torch_per_token_quant_fp8(
+    input: torch.Tensor,
+    tensor_layout: str ="HND",
+    FP8_MAX: float = 224.0,
+    smooth_v: bool = True,
+    alpha: float = 8.0,                   # 峰值相对 RMS 的上限倍数
+    eps: float = 1e-12
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Pure PyTorch reference implementation for per-token FP8 quantization."""
+    device = input.device
+    dtype = input.dtype
 
+    _tensor_layout = 0 if tensor_layout == "NHD" else 1
+
+    if tensor_layout == "HND":
+        b, h_kv, kv_len, head_dim = input.shape
+        padded_len = (kv_len + 63) // 64 * 64
+        v_t = torch.zeros((b, h_kv, head_dim, padded_len), dtype=dtype, device=device)
+
+    elif tensor_layout == "NHD":
+        b, kv_len, h_kv, head_dim = input.shape
+        padded_len = (kv_len + 63) // 64 * 64
+        v_t = torch.zeros((b, head_dim, h_kv, padded_len), dtype=dtype, device=device)
+    
+    _fused.transpose_pad_permute_cuda(input, v_t, _tensor_layout)
+
+    # Find max absolute value per token (row) - exactly like CUDA kernel
+    max_vals = v_t.abs().amax(dim=-1)  # [num_tokens]
+
+    # Calculate scale per token - exactly like CUDA kernel: scale = max_value / FP8_E4M3_MAX
+    scale = (max_vals / FP8_MAX).clamp_min(eps)  # [num_tokens]
+
+    # No special zero handling - directly compute 1.0 / scale like CUDA kernel
+    scale_inv = 1.0 / scale  # [num_tokens]
+
+    # Quantize: input * scale_inv, then clamp to FP8 range
+    quantized_float = v_t * scale_inv.unsqueeze(-1)  # Broadcast scale_inv
+    quantized_float = torch.clamp(quantized_float, -FP8_MAX, FP8_MAX)
+
+    # Convert to FP8 - use more explicit conversion
+    v_fp8 = quantized_float.to(torch.float8_e4m3fnuz)
+
+    return v_fp8, scale
+
+
+def quant_fp8_per_channel_affine_huber_autoalpha(
+    v: torch.Tensor,                      # (b,h,n,d)
+    tensor_layout: str = "HND",
+    FP8_MAX: float = 224.0,
+    target_sat: float = 1e-3,             # 目标饱和率(每通道)，例如 0.1%
+    alpha_bounds: Tuple[float, float] = (4.0, 16.0),  # α 搜索区间
+    iters: int = 6,                        # 二分迭代轮次
+    eps: float = 1e-12
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """
+    仿射(去均值) + Huber/RMS + 每通道自适应 α
+    返回:
+      v_fp8: (b,h,d,n_pad)  float8_e4m3fnuz
+      scale: (b,h,d)
+      mean:  (b,h,d)
+    """
+    assert v.ndim == 4 and tensor_layout in ("HND","NHD")
+    b,h,n,d = v.shape
+    n_pad = (n + 63)//64*64
+
+    # 1) (b,h,n,d) -> (b,h,d,n_pad)
+    v_t = torch.zeros((b,h,d,n_pad), dtype=v.dtype, device=v.device)
+    _tensor_layout = 0 if tensor_layout=="NHD" else 1
+    _fused.transpose_pad_permute_cuda(v, v_t, _tensor_layout)
+
+    # 2) 仿射去均值（统计用 FP32 稳定些）
+    vt32 = v_t.to(torch.float32)
+    mean = vt32.mean(dim=-1)                                 # (b,h,d)
+    vt0  = vt32 - mean.unsqueeze(-1)                         # (b,h,d,n_pad)
+
+    # 3) Huber/RMS 所需统计量
+    a      = vt0.abs()
+    max_ch = a.amax(dim=-1)                                  # (b,h,d)
+    rms    = torch.sqrt((vt0*vt0).mean(dim=-1) + 1e-24)      # (b,h,d)
+
+    # 极端零通道：后面会 zero-safe 处理
+    # 4) 每通道二分搜索 α，使饱和率 ~ target_sat
+    alpha_lo = torch.full_like(rms, alpha_bounds[0], dtype=torch.float32)
+    alpha_hi = torch.full_like(rms, alpha_bounds[1], dtype=torch.float32)
+    alpha    = (alpha_lo + alpha_hi) * 0.5
+
+    for _ in range(iters):
+        max_smooth = torch.minimum(max_ch, alpha * rms)                      # (b,h,d)
+        # zero-safe：全零通道临时置 1，避免 1/0（实际不会影响 sat 的判断）
+        tmp_scale  = torch.where(max_smooth>0, max_smooth/FP8_MAX, torch.ones_like(max_smooth))
+        inv        = 1.0 / (tmp_scale + eps)
+        qf         = vt0 * inv.unsqueeze(-1)                                 # (b,h,d,n_pad)
+
+        sat = (qf.abs() > FP8_MAX - 1e-6).to(torch.float32).mean(dim=-1)     # (b,h,d) 每通道饱和率
+
+        # 饱和率过高 -> α 太小 -> 提高下界；反之收紧上界
+        too_high = sat > target_sat
+        alpha_lo = torch.where(too_high, alpha, alpha_lo)
+        alpha_hi = torch.where(too_high, alpha_hi, alpha)
+        alpha    = (alpha_lo + alpha_hi) * 0.5
+
+    # 5) 用最终 α 计算真正的 scale 并量化
+    max_smooth = torch.minimum(max_ch, alpha * rms)                           # (b,h,d)
+    scale = torch.where(max_smooth>0, max_smooth/FP8_MAX, torch.ones_like(max_smooth))
+
+    inv = 1.0 / (scale + eps)
+    qf  = vt0 * inv.unsqueeze(-1)                                            # (b,h,d,n_pad)
+    qf  = torch.clamp(qf, -FP8_MAX, FP8_MAX)
+    v_fp8 = qf.to(torch.float8_e4m3fnuz)
+
+    # 把统计量回到原 dtype（可选）
+    mean  = mean.to(v.dtype)
+    scale = scale.to(v.dtype)
+    return v_fp8, scale, mean
 
 
     

@@ -51,7 +51,8 @@ from .quant import per_block_int8 as per_block_int8_cuda
 from .quant import per_warp_int8 as per_warp_int8_cuda
 from .quant import sub_mean
 from .quant import per_channel_fp8
-
+from .quant import torch_per_token_quant_fp8
+from .quant import quant_fp8_per_channel_affine_huber_autoalpha
 from typing import Any, List, Literal, Optional, Tuple, Union
 import warnings
 
@@ -826,8 +827,10 @@ def sageattn_qk_int8_pv_fp8_cuda(
         else:
             v = torch.cat([v, torch.zeros(v.size(0), v_pad_len, v.size(2), v.size(3), dtype=v.dtype, device=v.device)], dim=1)
 
-    v_fp8, v_scale, vm = per_channel_fp8(v, tensor_layout=tensor_layout, scale_max=quant_v_scale_max, smooth_v=smooth_v)
-    
+    v_fp8, v_scale, vm = per_channel_fp8(v, tensor_layout=tensor_layout, scale_max=224, smooth_v=smooth_v)
+    # v_fp8, v_scale = torch_per_token_quant_fp8(v, tensor_layout=tensor_layout, FP8_MAX=224,smooth_v=smooth_v)
+    # v_fp8, v_scale,vm = quant_fp8_per_channel_affine_huber_autoalpha(v, tensor_layout=tensor_layout, FP8_MAX=224 )
+    v_fp8 = v_fp8.contiguous()
     # print(f"-----------------------------{smooth_v}-----------------------------")
     # print(f"-----------------------------------------------------{tensor_layout}-------------------------------")
     # print("q_int8.shape:",q_int8.shape)
@@ -837,11 +840,15 @@ def sageattn_qk_int8_pv_fp8_cuda(
     # print("v_scale shape:", v_scale.shape)
     # print(smooth_v)
     # print(pv_accum_dtype)
+    vtest = v.narrow(2,0,kv_len)
+    v_fp8_trans = v_fp8.narrow(3,0,kv_len).permute(0,1,3,2).contiguous()
     import os, sys
     import torch.distributed as dist
 
-    SAVE_PATH = "/home/tmp/v_files/v.pt"     # 放到你的挂载卷
+    SAVE_PATH = "/home/tmp/lastv/v.pt"     # 放到你的挂载卷
+    SAVE_PATH1 = "/home/tmp/lastv/vscale.pt"
     MARKER    = SAVE_PATH + ".first"       # “谁先创建谁保存”的标记文件
+    MARKER1    = SAVE_PATH1 + ".first"
 
     def _is_rank0():
         return not (dist.is_available() and dist.is_initialized()) or dist.get_rank() == 0
@@ -870,7 +877,9 @@ def sageattn_qk_int8_pv_fp8_cuda(
         print(f"[INFO] Quantized V saved to: {save_path}")
         sys.stdout.flush()
 
-    _save_quant_once(v)
+    _save_quant_once(v_fp8_trans)
+    _save_quant_once(v_scale,SAVE_PATH1,MARKER1)
+
     # if pv_accum_dtype == "fp32":
     #     if smooth_v:
     #         lse = _qattn_sm89.qk_int8_sv_f8_accum_f32_fuse_v_scale_fuse_v_mean_attn(q_int8, k_int8, v_fp8, o, q_scale, k_scale, v_scale, vm, _tensor_layout, _is_caual, _qk_quant_gran, sm_scale, _return_lse)
@@ -887,7 +896,7 @@ def sageattn_qk_int8_pv_fp8_cuda(
     
     o = o[..., :head_dim_og]
 
-    # _save_quant_once(v)
+    # _save_quant_once(o)
 
     if return_lse:
         return o, lse / 1.44269504 + lse_correction * sm_scale if smooth_k else lse / 1.44269504

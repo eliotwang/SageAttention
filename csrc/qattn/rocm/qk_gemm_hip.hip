@@ -448,15 +448,6 @@ ROCWMMA_KERNEL void __launch_bounds__(256) qk_gemm(int8_t *__restrict__ Q, int8_
         auto           localWarpCoord  = make_coord2d(threadIdx.x / WARP_SIZE, threadIdx.y);
         auto           localWarpOffset = localWarpCoord * warpTileSize;
 
-        // Global matrix coordinates for C/D
-                // Linearize tile mapping into blockIdx.x (grid can be 3D; y/z reserved for batch/head)
-        // const uint32_t tilesM = (qo_len + get<0>(macroTileSize) - 1u) / get<0>(macroTileSize);
-        // const uint32_t lin    = blockIdx.x;
-        // const uint32_t tileM  = lin % tilesM;
-        // const uint32_t tileN  = lin / tilesM;
-        // auto macroTileCoord   = make_coord2d(tileM, tileN) * macroTileSize;
-        // auto warpTileCoord  = macroTileCoord + localWarpOffset;
-
 
         const uint32_t batch_id = blockIdx.z;
         const uint32_t bx = blockIdx.x;

@@ -213,6 +213,8 @@ rocm_cxx_flags = [
 # hipcc 的参数用 'nvcc' key 传入（在 ROCm 下会映射到 hipcc）
 rocm_hipcc_flags = [
     "-O3", "-g", "-ggdb", "-std=c++17",
+    "-DHIP_FP8_TYPE_FNUZ", "-DENABLE_BF16",
+    "-DENABLE_FP8",
 ] + rocm_offload_arch
 
 if IS_ROCM:
@@ -235,7 +237,7 @@ if IS_ROCM:
         ],
         extra_compile_args={"cxx": rocm_cxx_flags, "nvcc": rocm_hipcc_flags},
         # 这三行确保无需 LD_LIBRARY_PATH 也能找到依赖
-        libraries=["amdhip64", "hiprtc", "rocblas", "hipblas"],   # 视你代码实际用到的库增减
+        libraries=["amdhip64", "hiprtc", "rocblas", "hipblas", "c10", "torch", "torch_python"],   # 视你代码实际用到的库增减
         library_dirs=ROCM_LIB_DIRS + [TORCH_LIB_DIR],
         runtime_library_dirs=ROCM_LIB_DIRS + [TORCH_LIB_DIR],     # <— 关键
     )
@@ -251,7 +253,7 @@ if IS_ROCM:
         ],
     extra_compile_args={"cxx": rocm_cxx_flags, "nvcc": rocm_hipcc_flags},
     # 这三行确保无需 LD_LIBRARY_PATH 也能找到依赖
-    libraries=["amdhip64", "hiprtc", "rocblas", "hipblas"],   # 视你代码实际用到的库增减
+    libraries=["amdhip64", "hiprtc", "rocblas", "hipblas", "c10", "torch", "torch_python"],   # 视你代码实际用到的库增减
     library_dirs=ROCM_LIB_DIRS + [TORCH_LIB_DIR],
     runtime_library_dirs=ROCM_LIB_DIRS + [TORCH_LIB_DIR],
     )

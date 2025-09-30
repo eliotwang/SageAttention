@@ -226,8 +226,8 @@ def write_global_csv(all_heads_summary, out_dir):
 
 def main():
     ap = argparse.ArgumentParser(description="Per-head, per-row stats for svgemm output o (shape (1,H,8866,64))")
-    ap.add_argument("--pt", default="/home/tmp/qkroc/o_first.pt", help="输入 .pt 路径（o 的输出）")
-    ap.add_argument("--out", default="/home/tmp/oscv", help="CSV 输出目录")
+    ap.add_argument("--pt", default="/home/tmp/newv/vfp8.pt", help="输入 .pt 路径（o 的输出）")
+    ap.add_argument("--out", default="/home/tmp/os", help="CSV 输出目录")
     ap.add_argument("--expectH", type=int, default=30, help="期望 head 数（默认 30）")
     args = ap.parse_args()
 

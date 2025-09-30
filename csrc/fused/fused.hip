@@ -26,7 +26,25 @@
 // #include "../numeric_conversion.cuh"
 #include <hip/hip_runtime.h>
 #include <hip/hip_fp16.h>
+#include <hip/hip_fp8.h>
 #include <hip/hip_bfloat16.h>
+#include <ATen/hip/HIPContext.h>
+#include <torch/serialize.h>
+#include <torch/serialize/tensor.h>
+#include <ATen/ATen.h>
+#include <ATen/Functions.h>
+
+// enum __hip_fp8_interpretation_t {
+//   __HIP_E4M3 = 0,      /**< OCP E4M3 */
+//   __HIP_E5M2 = 1,      /**< OCP E5M2 */
+//   __HIP_E4M3_FNUZ = 2, /**< Standard FP8*/
+//   __HIP_E5M2_FNUZ = 3, /**< BF8 */
+// };
+
+// enum __hip_saturation_t {
+//   __HIP_NOSAT = 0,     /**< No saturation */
+//   __HIP_SATFINITE = 1, /**< Saturate to finite */
+// };
 
 enum class QuantType
 {
@@ -129,10 +147,14 @@ namespace detail {
   // ---- E4M3 打包：float32 -> uint8（rn、satfinite、非 subnormal）----
   // E4M3：1|4|3，bias=7；rn-even；satfinite；不产生 subnormal（下溢置0）
   __device__ __forceinline__ uint8_t float_to_e4m3_rn_satfinite_relaxed(float x) {
-    // NaN/Inf -> satfinite（带符号），用你定义的“最大码”
-    const uint8_t POS_MAX_CODE = 0x6F;  // sign=0, exp=14, mant=7  -> +240
-    const uint8_t NEG_MAX_CODE = 0xEF;  // sign=1, exp=14, mant=7  -> -240
-
+    const uint8_t POS_MAX_CODE = 0x76;
+    const uint8_t NEG_MAX_CODE = 0xF6;
+    const uint8_t NAN_CODE        = (uint8_t)((15 << 3) | 1);
+    
+    if (isnan(x)) {
+    // canonical NaN (positive sign); any mant != 0 is NaN
+    return NAN_CODE;
+    }
     if (!isfinite(x)) return signbit(x) ? NEG_MAX_CODE : POS_MAX_CODE;
     if (x == 0.0f)    return 0u;
 
@@ -170,16 +192,9 @@ namespace detail {
     // 仅当 eb==15 且 mant==7 时，判定为“上溢”（你定义的溢出码）；
     // 其他 eb==15 且 mant!=7 的情况，按“有效数”编码（非常规做法，需上下游一致解码）。
     if (eb >= 0xF) {
-      if (mant >= 7) {
         // eb==15 且 mant==7 -> 上溢（饱和到“最大码”）
         // 这里沿用你原有的“最大有限值”码（exp=14,mant=7），或你也可以选择返回 (15,7) 本码
-        return s ? NEG_MAX_CODE : POS_MAX_CODE;
-      } else {
-        // eb==15 且 mant!=7 -> 视为有效数（非常规编码）
-        uint8_t e_bits = 0xF;
-        uint8_t m_bits = (uint8_t)(mant & 0x7);
-        return s | (e_bits << 3) | m_bits;
-      }
+      return s ? NEG_MAX_CODE : POS_MAX_CODE;
     }
 
     // 常规（eb=1..14）
@@ -188,17 +203,16 @@ namespace detail {
     return s | (e_bits << 3) | m_bits;
   }
 
-  // ---- 把 4 个 float 打包成 e4m3x4，然后拼成 32-bit ----
   __device__ __forceinline__ void floatx4_to_e4m3x4(uint32_t* dest, float* s0, float* s1) {
-    // 注意：你原 PTX 的打包顺序是
     //   lo = cvt(..., s0[1], s0[0]); hi = cvt(..., s1[1], s1[0]); mov.b32 {lo,hi}
-    // 具体字节序请按你的上游/下游约定来（下面给出常用“小端：b0=LSB”示例）
-    uint8_t b0 = float_to_e4m3_rn_satfinite_relaxed(s0[0]);
-    uint8_t b1 = float_to_e4m3_rn_satfinite_relaxed(s0[1]);
-    uint8_t b2 = float_to_e4m3_rn_satfinite_relaxed(s1[0]);
-    uint8_t b3 = float_to_e4m3_rn_satfinite_relaxed(s1[1]);
+    // uint8_t b0 = c10::Float8_e4m3fnuz(
+    //       __hip_cvt_float_to_fp8(s0[0], __HIP_SATFINITE, __HIP_E4M3_FNUZ),
+    //       c10::Float8_e4m3fnuz::from_bits());
+    uint8_t b0 = __hip_cvt_float_to_fp8(s0[0], __HIP_SATFINITE, __HIP_E4M3_FNUZ);  
+    uint8_t b1 = __hip_cvt_float_to_fp8(s0[1], __HIP_SATFINITE, __HIP_E4M3_FNUZ);  
+    uint8_t b2 = __hip_cvt_float_to_fp8(s1[0], __HIP_SATFINITE, __HIP_E4M3_FNUZ);  
+    uint8_t b3 = __hip_cvt_float_to_fp8(s1[1], __HIP_SATFINITE, __HIP_E4M3_FNUZ);  
 
-    // 32-bit 小端拼接：最低字节是 b0
     *dest = (uint32_t)b0 | ((uint32_t)b1 << 8) | ((uint32_t)b2 << 16) | ((uint32_t)b3 << 24);
   }
 
@@ -347,9 +361,10 @@ __global__ void TransposePadPermuteKernel(T *__restrict__ input, T *__restrict__
 
   // 0, 1, 4, 5, 8, 9, 12, 13, 2, 3, 6, 7, 10, 11, 14, 15
   // permute on the seq dimension for fp8 mma
-  uint32_t smem_load_row_base = ((thread_id / num_threads_per_token) / 16) * 16;
-  uint32_t smem_load_row_mod = (thread_id / num_threads_per_token) % 16;
-  uint32_t smem_load_row = smem_load_row_base + (smem_load_row_mod  / 8) * 2 + ((smem_load_row_mod / 2) % 4) * 4 + (smem_load_row_mod % 2);
+  // uint32_t smem_load_row_base = ((thread_id / num_threads_per_token) / 16) * 16;
+  // uint32_t smem_load_row_mod = (thread_id / num_threads_per_token) % 16;
+  // uint32_t smem_load_row = smem_load_row_base + (smem_load_row_mod  / 8) * 2 + ((smem_load_row_mod / 2) % 4) * 4 + (smem_load_row_mod % 2);
+  uint32_t smem_load_row = thread_id / num_threads_per_token;
 
   detail::predicated_g2s_16B<pad_zero, T>(
       &shared_load[smem_load_row][ (thread_id % num_threads_per_token) * pack_size ],
